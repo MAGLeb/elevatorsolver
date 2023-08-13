@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 
-from test_generator.utils import inverse_cdf
+from case_generation.statistics import inverse_cdf
 
 
 def generate_time_call(n):
@@ -22,6 +22,8 @@ def generate_levels(n, max_level):
     levels = [random.randint(2, max_level) for _ in range(times_half)]
     tb = [[level, 1] for level in levels]
     bt = [list(reversed(pair)) for pair in tb]
+    tb = random.sample(tb, len(tb))
+    bt = random.sample(bt, len(bt))
     return tb, bt
 
 
@@ -41,21 +43,30 @@ def choose_level(tb, bt, p, tb_i, bt_i):
     return level, tb_i, bt_i
 
 
-def generate_test_sample(max_level, number_flat_in_level, human_per_flat, average_call_per_human, filename):
+def custom_sort(time_str):
+    hours, minutes = map(int, time_str.split(":"))
+    if hours < 6:
+        return 24 + hours, minutes
+    else:
+        return hours, minutes
+
+
+def generate_test_sample(max_level, number_flat_in_level, human_per_flat, average_call_per_human, elevators, filename):
     n = max_level * number_flat_in_level * human_per_flat * average_call_per_human
     if n % 2 == 1:
         n += 1
     times = generate_time_call(n)
-    times_sorted = sorted(times)
+    times.sort(key=custom_sort)
+
     top_bottom_levels, bottom_top_levels = generate_levels(n, max_level)
     top_bottom_index = 0
     bottom_top_index = 0
 
     with open(filename, 'w') as f:
-        f.write(f"{n} {max_level} {number_flat_in_level} {human_per_flat} {average_call_per_human}\n")
+        f.write(f"{n} {max_level} {number_flat_in_level} {human_per_flat} {average_call_per_human} {elevators}\n")
         for i in range(n):
             probability = i / n
             level_pair, top_bottom_index, bottom_top_index = choose_level(top_bottom_levels, bottom_top_levels,
                                                                           probability,
                                                                           top_bottom_index, bottom_top_index)
-            f.write(f"{times_sorted[i]} {level_pair[0]} {level_pair[1]}\n")
+            f.write(f"{times[i]} {level_pair[0]} {level_pair[1]}\n")
