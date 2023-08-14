@@ -4,9 +4,9 @@ from case_generation.generate import generate_test_sample
 from utils.environment import Environment
 
 
-CONFIG_PATH = Environment.get_path('./case_generation/config.txt')
+INPUT_PATH = Environment.get_path('case_generation/input.txt')
 
-with open(CONFIG_PATH, 'r') as f:
+with open(INPUT_PATH, 'r') as f:
     lines = f.readlines()
     number_tests = len(lines)
 

@@ -12,7 +12,8 @@ def generate_time_call(n):
         custom_random_value = inverse_cdf(u)
         hour = int(custom_random_value)
         minutes = int(60 * (custom_random_value - hour))
-        calls.append(f"{hour:02}:{minutes:02}")
+        seconds = int(60 * (60 * (custom_random_value - hour) - minutes))
+        calls.append(f"{hour:02}:{minutes:02}:{seconds:02}")
 
     return calls
 
@@ -44,11 +45,11 @@ def choose_level(tb, bt, p, tb_i, bt_i):
 
 
 def custom_sort(time_str):
-    hours, minutes = map(int, time_str.split(":"))
+    hours, minutes, seconds = map(int, time_str.split(":"))
     if hours < 6:
-        return 24 + hours, minutes
+        return 24 + hours, minutes, seconds
     else:
-        return hours, minutes
+        return hours, minutes, seconds
 
 
 def generate_test_sample(max_level, number_flat_in_level, human_per_flat, average_call_per_human, elevators, filename):

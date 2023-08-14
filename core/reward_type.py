@@ -1,0 +1,14 @@
+from enum import Enum
+
+
+class RewardType(Enum):
+    MOVE_BETWEEN_LEVELS = -2
+    OPEN_CLOSE_DOOR = -3
+    GET_PASSENGER = 50
+    DELIVER_PASSENGER = 100
+    CLOSE_DOOR = 15
+    MOVE_WITH_OPEN_DOOR = -1000
+    OPEN_ON_EMPTY_LEVEL = -50
+    WAIT_WHEN_NO_CALLS = 1
+    WAIT_WHEN_CALLS = -5
+
