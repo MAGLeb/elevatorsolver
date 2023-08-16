@@ -3,22 +3,22 @@ import random
 import numpy as np
 
 from core.action_type import ActionType
-from solution.q_table.utils import boolean_array_to_integer
+from solution.q_table_agent.utils import boolean_array_to_integer
 
 
 class LearningAgentQTable:
-    def __init__(self, levels, learning_rate=0.1, discount_rate=0.9, exploration_rate=1, exploration_fall=0.999):
+    def __init__(self, levels, learning_rate=0.1, discount_rate=0.9, exploration_rate=1, exploration_fall=0.9995):
         self.learning_rate = learning_rate
         self.discount_rate = discount_rate
         self.exploration_rate = exploration_rate
         self.exploration_fall = exploration_fall
-        self.q_table = np.zeroes((levels, 2 ** levels, 5))
+        self.q_table = np.zeroes((levels, 2 ** levels, 2 ** levels, 8, 5), dtype=np.int32)
 
-    def save(self):
-        pass
+    def save(self, filename):
+        np.save(filename, self.q_table)
 
-    def load(self):
-        pass
+    def load(self, filename):
+        self.q_table = np.load(filename)
 
     def choose_action(self, state) -> ActionType:
         random_action = random.random()
@@ -31,7 +31,6 @@ class LearningAgentQTable:
         return ActionType(best_action)
 
     def learn(self, state, reward, action, next_state):
-        # TODO in_action -> pass action
         calls, current_level, in_action = state
         calls_int = boolean_array_to_integer(calls)
 
@@ -42,4 +41,3 @@ class LearningAgentQTable:
         next_value = ((reward + self.discount_rate * np.max(self.q_table[next_current_level, next_calls_int])) *
                       self.learning_rate)
         self.q_table[current_level, calls_int, action] = current_value + next_value
-        # TODO finish write method
