@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 
-from core.action_type import ActionType
+from core.types.action_type import ActionType
 from solution.q_table_agent.utils import boolean_array_to_integer
 
 

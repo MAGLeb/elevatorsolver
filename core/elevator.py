@@ -1,18 +1,19 @@
+from core.level import Level
 from core.types.action_type import ActionType
 from core.types.level_type import LevelType
 from core.types.reward_type import RewardType
+from core.passenger import Passenger
 
 
 class Elevator:
     def __init__(self, levels):
         self.levels = levels
-        self.inside_calls = [LevelType.EMPTY] * levels
-        self.outside_calls = []
+        self.calls = [Level(i) for i in range(levels + 1)]
         self.passengers = []
 
-        self.current_level = 1
+        self.weight = 0
+        self.current_level = 0
         self.is_door_open = False
-        self.in_action = False
 
     def step(self, action: ActionType):
         reward = 0
@@ -43,17 +44,16 @@ class Elevator:
             self.is_door_open = False
 
         elif action == 3:
-            reward -= RewardType.OPEN_CLOSE_DOOR
-            self.is_door_open = True
-
-            if self.calls[self.current_level] == LevelType.GET_PASSENGER:
-                self.calls[self.current_level] = LevelType.EMPTY
-                reward += RewardType.GET_PASSENGER
-            elif self.calls[self.current_level] == LevelType.OUT_PASSENGER:
-                self.calls[self.current_level] = LevelType.EMPTY
+            if not self.calls[self.current_level].is_empty():
+                number_passengers = self.calls[self.current_level].get_passengers_into_elevator()
+                reward += RewardType.GET_PASSENGER * number_passengers
+            elif self.calls[self.current_level] == LevelType.CALLED:
+                self.outside_calls[self.current_level] = LevelType.EMPTY
                 reward += RewardType.DELIVER_PASSENGER
             else:
                 reward -= RewardType.OPEN_ON_EMPTY_LEVEL
+            reward -= RewardType.OPEN_CLOSE_DOOR
+            self.is_door_open = True
 
         elif action == 4:
             if self.calls.count(LevelType.EMPTY) == self.levels:
@@ -63,10 +63,10 @@ class Elevator:
 
         return self.get_state(), reward
 
-    def add_call(self, level, level_type: LevelType):
-        self.calls[level - 1] = level_type
+    def add_call(self, level, passenger: Passenger):
+        self.calls[level].set_outside_call(passenger)
 
     def get_state(self):
-        return self.calls, self.current_level, self.in_action
+        return self.inside_calls, self.outside_calls, self.current_level
 
 

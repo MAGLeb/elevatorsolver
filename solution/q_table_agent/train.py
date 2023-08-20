@@ -1,8 +1,8 @@
 from utils.environment import Environment
 from core.elevator import Elevator
-from solution.q_table.q_table import LearningAgentQTable
-from core.level_type import LevelType
-from core.time_wait_type import TimeWaitType
+from solution.q_table_agent.q_table_agent import LearningAgentQTable
+from core.types.level_type import LevelType
+from core.types.time_wait_type import TimeWaitType
 
 
 NUM_EPISODES = 100
