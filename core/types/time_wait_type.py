@@ -1,6 +1,6 @@
 from enum import Enum
 
-from core.action_type import ActionType
+from core.types.action_type import ActionType
 
 
 class TimeWaitType(Enum):
@@ -11,8 +11,8 @@ class TimeWaitType(Enum):
     @classmethod
     def get_time_to_wait(cls, action_type: ActionType):
         if action_type in [ActionType.CLOSE_DOOR, ActionType.OPEN_DOOR]:
-            return cls.OPEN_CLOSE_DOOR
+            return cls.OPEN_CLOSE_DOOR.value
         elif action_type in [ActionType.UP, ActionType.DOWN]:
-            return cls.MOVE_BETWEEN_LEVEL
+            return cls.MOVE_BETWEEN_LEVEL.value
         elif action_type == ActionType.WAIT:
-            return cls.WAIT
+            return cls.WAIT.value

@@ -12,7 +12,7 @@ class LearningAgentQTable:
         self.discount_rate = discount_rate
         self.exploration_rate = exploration_rate
         self.exploration_fall = exploration_fall
-        self.q_table = np.zeroes((levels, 2 ** levels, 2 ** levels, 8, 5), dtype=np.int32)
+        self.q_table = np.zeros((levels, 2 ** levels, 2 ** levels, 8, 5), dtype=np.int32)
 
     def save(self, filename):
         np.save(filename, self.q_table)
@@ -24,20 +24,29 @@ class LearningAgentQTable:
         random_action = random.random()
         if random_action < self.exploration_rate:
             return ActionType(random.randint(0, ActionType.__len__() - 1))
-        calls, current_level, _ = state
-        calls_int = boolean_array_to_integer(calls)
-        best_action = np.argmax(self.q_table[current_level, calls_int])
+        outside_calls, inside_calls, current_level, weight, _ = state
+        outside_calls_int = boolean_array_to_integer(outside_calls)
+        inside_calls_int = boolean_array_to_integer(inside_calls)
+        best_action = np.argmax(self.q_table[current_level, outside_calls_int, inside_calls_int, weight])
         self.exploration_rate *= self.exploration_fall
         return ActionType(best_action)
 
-    def learn(self, state, reward, action, next_state):
-        calls, current_level, in_action = state
-        calls_int = boolean_array_to_integer(calls)
+    def learn(self, state, reward, action: ActionType, next_state):
+        outside_calls, inside_calls, current_level, weight = state
+        outside_calls_int = boolean_array_to_integer(outside_calls)
+        inside_calls_int = boolean_array_to_integer(inside_calls)
 
-        next_calls, next_current_level, next_in_action = next_state
-        next_calls_int = boolean_array_to_integer(next_calls)
+        next_outside_calls, next_inside_calls, next_current_level, next_weight = next_state
+        next_outside_calls_int = boolean_array_to_integer(next_outside_calls)
+        next_inside_calls_int = boolean_array_to_integer(next_inside_calls)
 
-        current_value = self.q_table[current_level, calls_int, action] * (1 - self.learning_rate)
-        next_value = ((reward + self.discount_rate * np.max(self.q_table[next_current_level, next_calls_int])) *
+        action = action.value
+        current_level -= 1
+        next_current_level -= 1
+        current_value = self.q_table[current_level, outside_calls_int, inside_calls_int, weight, action] * (
+                1 - self.learning_rate)
+        next_value = ((reward + self.discount_rate *
+                       np.max(self.q_table[
+                                  next_current_level, next_outside_calls_int, next_inside_calls_int, next_weight])) *
                       self.learning_rate)
-        self.q_table[current_level, calls_int, action] = current_value + next_value
+        self.q_table[current_level, outside_calls_int, inside_calls_int, weight, action] = current_value + next_value
