@@ -1,40 +1,22 @@
 from core.elevator import Elevator
 from core.passenger import Passenger
 from core.types.time_wait_type import TimeWaitType
-from solution.q_table_agent.q_table_agent import LearningAgentQTable
-from utils.environment import Environment
-
-NUM_EPISODES = 100
-MAX_STEPS = 86400
-TEST_PATH = Environment.get_path('cases/case0/test_0.txt')
+from core.solution.q_table_agent.q_table_agent import LearningAgentQTable
 
 
-def train():
-    commands = []
-    with open(TEST_PATH, 'r') as f:
-        line = f.readline()
-        n, levels, _, _, _, _ = map(int, line.split())
-        while n != 0:
-            line = f.readline().strip().split()
-            time, from_level, to_level, weight = line
-            from_level = int(from_level)
-            to_level = int(to_level)
-            weight = int(weight)
-            commands.append([time, from_level, to_level, weight])
-            n -= 1
-
+def train(commands, levels, max_steps, num_episodes, max_weight):
     agent = LearningAgentQTable(levels)
-    agent.load('1.npy')
+    agent.load('q_table_agent.npy')
     total_rewards = []
 
-    for episode in range(NUM_EPISODES):
-        elevator_max_weight = 680
+    for episode in range(num_episodes):
+        elevator_max_weight = max_weight
         elevator = Elevator(levels, elevator_max_weight)
         state = elevator.get_state()
         total_reward = 0
         steps_to_wait = 0
 
-        for step in range(MAX_STEPS * 10):
+        for step in range(max_steps * 2):
             if steps_to_wait == 0:
                 action = agent.choose_action(state)
                 next_state, reward = elevator.step(action)
@@ -46,7 +28,7 @@ def train():
 
             if len(commands) > 0:
                 time, from_level, to_level, weight_passenger = commands[0]
-                if (step % MAX_STEPS) == int(time):
+                if (step % max_steps) == int(time):
                     passenger = Passenger(from_level, to_level, weight_passenger)
                     elevator.add_call(from_level, False, passenger)
                     state = elevator.get_state()
@@ -55,6 +37,7 @@ def train():
         total_rewards.append(total_reward)
         print(f"Episode {episode + 1}: Total Reward: {total_reward}")
 
-    agent.save('1')
-    print(f"max:{max(total_rewards)}, average:{sum(total_rewards) / NUM_EPISODES}")
+    agent.save('q_table_agent')
+    print(f"max:{max(total_rewards)}, average:{sum(total_rewards) / num_episodes}")
     print("Training finished.")
+    return total_rewards

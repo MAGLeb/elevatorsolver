@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 
-from case_generation.time_distribution import inverse_cdf
+from time_distribution import inverse_cdf
 
 
 def hour_minute_second_format(random_value):
@@ -82,7 +82,7 @@ def choose_level(tb, bt, p, tb_i, bt_i):
 
 
 def generate_test_sample(max_level, number_flat_in_level, human_per_flat, average_call_per_human, elevators, filename):
-    n = max_level * number_flat_in_level * human_per_flat * average_call_per_human
+    n = int(max_level * number_flat_in_level * human_per_flat * average_call_per_human)
     if n % 2 == 1:
         n += 1
     times = generate_time_call(n)
