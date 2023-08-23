@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 
-from time_distribution import inverse_cdf
+from case_generation.time_distribution import inverse_cdf
 
 
 def hour_minute_second_format(random_value):

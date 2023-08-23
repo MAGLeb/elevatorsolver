@@ -1,12 +1,15 @@
+import os
+
 from core.elevator import Elevator
 from core.passenger import Passenger
 from core.types.time_wait_type import TimeWaitType
 from core.solution.q_table_agent.q_table_agent import LearningAgentQTable
 
 
-def train(commands, levels, max_steps, num_episodes, max_weight):
+def train(commands, levels, max_steps, num_episodes, max_weight, agent_path):
     agent = LearningAgentQTable(levels)
-    agent.load('q_table_agent.npy')
+    if os.path.exists(agent_path):
+        agent.load(agent_path)
     total_rewards = []
 
     for episode in range(num_episodes):
@@ -37,7 +40,7 @@ def train(commands, levels, max_steps, num_episodes, max_weight):
         total_rewards.append(total_reward)
         print(f"Episode {episode + 1}: Total Reward: {total_reward}")
 
-    agent.save('q_table_agent')
+    agent.save(agent_path)
     print(f"max:{max(total_rewards)}, average:{sum(total_rewards) / num_episodes}")
     print("Training finished.")
     return total_rewards

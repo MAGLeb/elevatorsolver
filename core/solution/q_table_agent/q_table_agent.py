@@ -3,7 +3,7 @@ import random
 import numpy as np
 
 from core.types.action_type import ActionType
-from solution.q_table_agent.utils import boolean_array_to_integer
+from core.solution.q_table_agent.utils import boolean_array_to_integer
 
 
 class LearningAgentQTable:
@@ -18,7 +18,7 @@ class LearningAgentQTable:
         np.save(filename, self.q_table)
 
     def load(self, filename):
-        self.q_table = np.load(filename)
+        self.q_table = np.load(f'{filename}.npy')
 
     def choose_action(self, state) -> ActionType:
         random_action = random.random()

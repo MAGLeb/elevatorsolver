@@ -61,7 +61,7 @@ class Elevator:
         return outside_calls, inside_calls, self.current_level, self.get_weight_state()
 
     def get_weight_state(self):
-        return int((self.weight * 8 / self.max_weight))
+        return max(7, int((self.weight * 8 / self.max_weight)))
 
     def _up(self):
         reward = 0
@@ -112,7 +112,7 @@ class Elevator:
 
         # 3. negative reward
         if reward == 0:
-            reward -= RewardType.OPEN_ON_EMPTY_LEVEL
+            reward -= RewardType.OPEN_ON_EMPTY_LEVEL.value
         reward -= RewardType.OPEN_CLOSE_DOOR.value
         self.is_door_open = True
 
