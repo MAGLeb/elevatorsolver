@@ -61,7 +61,7 @@ class Elevator:
         return outside_calls, inside_calls, self.current_level, self.get_weight_state()
 
     def get_weight_state(self):
-        return max(7, int((self.weight * 8 / self.max_weight)))
+        return min(7, int((self.weight * 8 / self.max_weight)))
 
     def _up(self):
         reward = 0
