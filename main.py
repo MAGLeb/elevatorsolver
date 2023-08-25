@@ -16,7 +16,7 @@ for i in range(Environment.NUMBER_TEST_PER_CASE):
 
     # READ TEST
     commands = []
-    case_path = Environment.get_case_path(0)
+    case_path = Environment.get_case_path(1)
     test_path = os.path.join(case_path, f'tests/test{i}.txt')
     print(f"Reading test data from {test_path}")
     with open(test_path, 'r') as f:
