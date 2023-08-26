@@ -7,7 +7,7 @@ from core.solution.q_table_agent.utils import boolean_array_to_integer
 
 
 class LearningAgentQTable:
-    def __init__(self, levels, learning_rate=0.1, discount_rate=0.9, exploration_rate=1, exploration_fall=0.9995):
+    def __init__(self, levels, learning_rate=0.1, discount_rate=0.9, exploration_rate=1, exploration_fall=0.975):
         self.learning_rate = learning_rate
         self.discount_rate = discount_rate
         self.exploration_rate = exploration_rate
