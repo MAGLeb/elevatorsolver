@@ -112,6 +112,8 @@ class Elevator:
 
         # 3. negative reward
         if reward == 0:
+            if self.is_door_open:
+                reward -= RewardType.OPEN_ON_EMPTY_LEVEL.value
             reward -= RewardType.OPEN_ON_EMPTY_LEVEL.value
         reward -= RewardType.OPEN_CLOSE_DOOR.value
         self.is_door_open = True
@@ -121,7 +123,7 @@ class Elevator:
     def _wait(self):
         reward = 0
         empty_levels = [level for level in self.levels if level.is_empty()]
-        if len(empty_levels) == self.max_levels:
+        if len(empty_levels) == self.max_levels + 1:
             reward += RewardType.WAIT_WHEN_NO_CALLS.value
         else:
             reward -= RewardType.WAIT_WHEN_CALLS.value

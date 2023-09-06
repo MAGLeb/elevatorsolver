@@ -18,17 +18,17 @@ class LearningAgentQTable:
         np.save(filename, self.q_table)
 
     def load(self, filename):
-        self.q_table = np.load(f'{filename}.npy')
+        self.q_table = np.load(f'{filename}')
 
     def choose_action(self, state) -> ActionType:
+        self.exploration_rate *= self.exploration_fall
         random_action = random.random()
         if random_action < self.exploration_rate:
             return ActionType(random.randint(0, ActionType.__len__() - 1))
-        outside_calls, inside_calls, current_level, weight, _ = state
+        outside_calls, inside_calls, current_level, weight = state
         outside_calls_int = boolean_array_to_integer(outside_calls)
         inside_calls_int = boolean_array_to_integer(inside_calls)
-        best_action = np.argmax(self.q_table[current_level, outside_calls_int, inside_calls_int, weight])
-        self.exploration_rate *= self.exploration_fall
+        best_action = np.argmax(self.q_table[current_level - 1, outside_calls_int, inside_calls_int, weight])
         return ActionType(best_action)
 
     def learn(self, state, reward, action: ActionType, next_state):

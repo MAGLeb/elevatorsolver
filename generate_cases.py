@@ -3,9 +3,10 @@ import os
 from case_generation.generate import generate_test_sample
 from core.utils.environment import Environment
 
-INPUT_TESTS = [3, 10, 2.5, 3, 1]
+INPUT_TESTS = [6, 10, 2.5, 3, 1]
+CASE_NUMBER = 0
 
-case_path = Environment.get_case_path(1)
+case_path = Environment.get_case_path(CASE_NUMBER)
 tests_path = f"{case_path}/tests"
 
 os.makedirs(tests_path, exist_ok=True)

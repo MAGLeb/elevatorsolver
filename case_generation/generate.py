@@ -30,10 +30,10 @@ def custom_seconds_sort(seconds):
 
 
 def seconds_format(random_value):
-    return int(random_value / 24 * 86400)
+    return int(random_value * 86400 / 24)
 
 
-def generate_time_call(n, is_seconds_format: bool = True):
+def generate_time_call(n, is_seconds_format: bool = True, is_sorted: bool = False):
     calls = []
     uniform_random_values = np.random.uniform(0, 1, n)
     for u in uniform_random_values:
@@ -44,10 +44,13 @@ def generate_time_call(n, is_seconds_format: bool = True):
         else:
             hours, minutes, seconds = hour_minute_second_format(custom_random_value)
             calls.append(f"{hours:02}:{minutes:02}:{seconds:02}")
-    if is_seconds_format:
-        calls.sort(key=custom_seconds_sort)
+    if is_sorted:
+        if is_seconds_format:
+            calls.sort(key=custom_seconds_sort)
+        else:
+            calls.sort(key=custom_time_sort)
     else:
-        calls.sort(key=custom_time_sort)
+        calls.sort()
     return calls
 
 
@@ -82,7 +85,7 @@ def choose_level(tb, bt, p, tb_i, bt_i):
 
 
 def generate_test_sample(max_level, number_flat_in_level, human_per_flat, average_call_per_human, elevators, filename):
-    n = int(max_level * number_flat_in_level * human_per_flat * average_call_per_human)
+    n = int(max_level * number_flat_in_level * human_per_flat * average_call_per_human * 10)
     if n % 2 == 1:
         n += 1
     times = generate_time_call(n)

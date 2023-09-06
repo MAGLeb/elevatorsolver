@@ -8,8 +8,8 @@ from core.solution.q_table_agent.q_table_agent import LearningAgentQTable
 
 def train(commands, levels, max_steps, num_episodes, max_weight, agent_path):
     agent = LearningAgentQTable(levels)
-    if os.path.exists(agent_path):
-        agent.load(agent_path)
+    if os.path.exists(f'{agent_path}.npy'):
+        agent.load(f'{agent_path}.npy')
     total_rewards = []
 
     for episode in range(num_episodes):
@@ -19,7 +19,7 @@ def train(commands, levels, max_steps, num_episodes, max_weight, agent_path):
         total_reward = 0
         steps_to_wait = 0
 
-        for step in range(max_steps * 2):
+        for step in range(max_steps * 3):
             if steps_to_wait == 0:
                 action = agent.choose_action(state)
                 next_state, reward = elevator.step(action)
@@ -30,8 +30,10 @@ def train(commands, levels, max_steps, num_episodes, max_weight, agent_path):
             steps_to_wait = max(0, steps_to_wait - 1)
 
             if len(commands) > 0:
-                time, from_level, to_level, weight_passenger = commands[0]
-                if (step % max_steps) == int(time):
+                while len(commands) > 0:
+                    time, from_level, to_level, weight_passenger = commands[0]
+                    if (step % max_steps) != int(time):
+                        break
                     passenger = Passenger(from_level, to_level, weight_passenger)
                     elevator.add_call(from_level, False, passenger)
                     state = elevator.get_state()

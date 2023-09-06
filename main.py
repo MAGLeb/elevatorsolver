@@ -6,6 +6,7 @@ from core.utils.environment import Environment
 NUM_EPISODES = 100
 MAX_STEPS = 86400
 ELEVATOR_MAX_WEIGHT = 680
+CASE_NUMBER = 0
 
 print(f"Training settings: NUM_EPISODES = {NUM_EPISODES},"
       f" MAX_STEPS = {MAX_STEPS}, ELEVATOR_MAX_WEIGHT = {ELEVATOR_MAX_WEIGHT}")
@@ -16,7 +17,7 @@ for i in range(Environment.NUMBER_TEST_PER_CASE):
 
     # READ TEST
     commands = []
-    case_path = Environment.get_case_path(1)
+    case_path = Environment.get_case_path(CASE_NUMBER)
     test_path = os.path.join(case_path, f'tests/test{i}.txt')
     print(f"Reading test data from {test_path}")
     with open(test_path, 'r') as f:
