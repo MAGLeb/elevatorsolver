@@ -113,5 +113,5 @@ def generate_tests(path, filename, number_tests, levels, flats,
     for j in range(number_tests):
         path_filename = f"{path}/{filename}_{j}.txt"
 
-        print(f"Generating sample {j + 1}")
+        print(f"Generating sample {j + 1} to {path_filename}")
         generate_test_sample(levels, flats, average_human_per_flat, average_call_per_human, number_elevators, path_filename)
