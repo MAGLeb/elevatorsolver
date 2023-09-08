@@ -18,7 +18,10 @@ class LearningAgentQTable:
         np.save(filename, self.q_table)
 
     def load(self, filename):
-        self.q_table = np.load(f'{filename}')
+        self.q_table = np.load(filename)
+
+    def reset_exploration_rate(self):
+        self.exploration_rate = 1
 
     def choose_action(self, state) -> ActionType:
         self.exploration_rate *= self.exploration_fall

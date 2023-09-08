@@ -1,3 +1,4 @@
+import os
 import random
 
 import numpy as np
@@ -85,7 +86,7 @@ def choose_level(tb, bt, p, tb_i, bt_i):
 
 
 def generate_test_sample(max_level, number_flat_in_level, human_per_flat, average_call_per_human, elevators, filename):
-    n = int(max_level * number_flat_in_level * human_per_flat * average_call_per_human * 10)
+    n = int(max_level * number_flat_in_level * human_per_flat * average_call_per_human)
     if n % 2 == 1:
         n += 1
     times = generate_time_call(n)
@@ -103,3 +104,14 @@ def generate_test_sample(max_level, number_flat_in_level, human_per_flat, averag
                                                                           top_bottom_index, bottom_top_index)
             weight_of_passenger = generate_weight_passenger()
             f.write(f"{times[i]} {level_pair[0]} {level_pair[1]} {weight_of_passenger}\n")
+
+
+def generate_tests(path, filename, number_tests, levels, flats,
+                   average_human_per_flat, average_call_per_human, number_elevators):
+    os.makedirs(path, exist_ok=True)
+
+    for j in range(number_tests):
+        path_filename = f"{path}/{filename}_{j}.txt"
+
+        print(f"Generating sample {j + 1}")
+        generate_test_sample(levels, flats, average_human_per_flat, average_call_per_human, number_elevators, path_filename)
