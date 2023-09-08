@@ -4,18 +4,11 @@ from core.utils.environment import Environment
 from core.elevator import Elevator
 from core.passenger import Passenger
 from core.types.time_wait_type import TimeWaitType
-from core.solution.q_table_agent.q_table_agent import LearningAgentQTable
 
 
-def validate(commands, levels, agent_path):
+def validate(commands, levels, agent):
     max_steps = Environment.MAX_STEPS
     max_weight = Environment.ELEVATOR_MAX_WEIGHT
-
-    agent = LearningAgentQTable(levels, exploration_rate=0)
-    if os.path.exists(f'{agent_path}.npy'):
-        agent.load(f'{agent_path}.npy')
-    else:
-        raise ValueError("Can not find the model file.")
 
     elevator = Elevator(levels, max_weight)
     state = elevator.get_state()

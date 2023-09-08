@@ -2,6 +2,8 @@ import os
 
 from dotenv import load_dotenv
 
+from core.types.agent_type import AgentType
+
 load_dotenv()
 
 
@@ -15,7 +17,9 @@ class Environment:
     NUM_EPISODES = 100 if IS_PRODUCTION else 3
     MAX_STEPS = 86401
     ELEVATOR_MAX_WEIGHT = 680
+
     CASE_NUMBER = os.environ.get('CASE_NUMBER', 0)
+    AGENT_TYPE = AgentType(os.environ.get('AGENT_TYPE', "Q_TABLE"))
 
     @classmethod
     def get_input_train_params(cls):
@@ -24,6 +28,11 @@ class Environment:
             params = f.readline().split()
             params = list(map(int, params))
         return params
+
+    @classmethod
+    def get_agent_path(cls):
+        filepath = os.path.join(cls.PROJECT_PATH, "cases", f"case{cls.CASE_NUMBER}", f"{cls.AGENT_TYPE.value}_agent.npy")
+        return filepath
 
     @staticmethod
     def get_path(relative_path=""):

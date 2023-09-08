@@ -6,6 +6,7 @@ class RewardType(Enum):
     CLOSE_DOOR = 15
     GET_PASSENGER = 50
     DELIVER_PASSENGER = 100
+    # add distance between current_level and where to go
 
     MOVE_BETWEEN_LEVELS = 5
     WAIT_WHEN_CALLS = 50

@@ -58,7 +58,8 @@ class Elevator:
     def get_state(self):
         outside_calls = [level.type[0] for level in self.levels]
         inside_calls = [level.type[1] for level in self.levels]
-        return outside_calls, inside_calls, self.current_level, self.get_weight_state()
+        is_opened = 1 if self.is_door_open else 0
+        return outside_calls, inside_calls, self.current_level, self.get_weight_state(), is_opened
 
     def get_weight_state(self):
         return min(7, int((self.weight * 8 / self.max_weight)))
