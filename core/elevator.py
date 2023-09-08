@@ -30,7 +30,10 @@ class Elevator:
             reward = self._wait()
         else:
             raise ValueError("Only 5 types of action.")
-        return self.get_state(), reward
+        state = self.get_state()
+        reward -= sum(state[0]) * RewardType.PASSENGER_WAIT.value
+        reward -= sum(state[1]) * RewardType.PASSENGER_WAIT.value
+        return state, reward
 
     def get_passengers_into_elevator(self, level: Level):
         passengers = 0
