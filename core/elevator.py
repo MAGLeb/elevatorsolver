@@ -76,7 +76,6 @@ class Elevator:
             reward -= RewardType.MOVE_NEXT_TO_EDGE.value
         else:
             self.current_level += 1
-            reward -= RewardType.MOVE_BETWEEN_LEVELS.value
         return reward
 
     def _down(self):
@@ -88,14 +87,12 @@ class Elevator:
             reward -= RewardType.MOVE_NEXT_TO_EDGE.value
         else:
             self.current_level -= 1
-            reward -= RewardType.MOVE_BETWEEN_LEVELS.value
         return reward
 
     def _close(self):
         reward = 0
         if self.is_door_open:
             reward += RewardType.CLOSE_DOOR.value
-        reward -= RewardType.OPEN_CLOSE_DOOR.value
         self.is_door_open = False
         return reward
 
@@ -119,7 +116,6 @@ class Elevator:
             if self.is_door_open:
                 reward -= RewardType.OPEN_ON_EMPTY_LEVEL.value
             reward -= RewardType.OPEN_ON_EMPTY_LEVEL.value
-        reward -= RewardType.OPEN_CLOSE_DOOR.value
         self.is_door_open = True
 
         return reward
