@@ -31,11 +31,11 @@ def plot(case_number):
     avg_series = pd.Series(avg_results)
     
     # Trend using rolling average
-    trend = avg_series.rolling(window=5).mean()
+    trend = avg_series.rolling(window=100).mean()
 
     # Detect outliers using IQR
-    Q1 = avg_series.quantile(0.25)
-    Q3 = avg_series.quantile(0.75)
+    Q1 = avg_series.quantile(0.1)
+    Q3 = avg_series.quantile(0.9)
     IQR = Q3 - Q1
     outliers = avg_series[(avg_series < (Q1 - 1.5 * IQR)) | (avg_series > (Q3 + 1.5 * IQR))]
     
