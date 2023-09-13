@@ -2,3 +2,69 @@
 **/__pycache__/
 .env
 cases/
+
+# .gitignore for Unity projects
+
+# === Unity generated ===
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ibrary/
+
+# === Rider ===
+.idea/
+
+# === Visual Studio / Rider ===
+ExportedObj/
+.vscode/
+*.svd
+*.userprefs
+*.csproj
+*.pidb
+*.suo
+*.sln*
+*.user
+*.unityproj
+*.booproj
+
+# === Mac ===
+*.swp
+*.back~
+*.merge~
+*.meta
+*.tmp*
+*.bak
+*.swm
+*.swn
+*.swo
+*.swp
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Desktop.ini
+
+# === Windows ===
+[.Tt]humbs.db
+*.DStore
+
+# === Linux ===
+*~
+
+# === Backup & Temporary files ===
+*.tmp
+*.bak
+*.swp
+*.back~
+*.autosave
+
+# === Logs ===
+*.log
+
+# === Others ===
+# Add files that you want to exclude. For example:
+# secrets.json
+
