@@ -3,16 +3,15 @@ using UnityEngine;
 
 public class ElevatorController : MonoBehaviour
 {
-    public Transform[] floors; // массив позиций этажей
     public Transform leftDoor; // Левая дверь
     public Transform rightDoor; // Правая дверь
     
     private Vector3 leftDoorClosedPosition;
 	private Vector3 rightDoorClosedPosition;
-
+    private bool isDoorOpen = false;
 
     public float speed = 3.0f; // скорость лифта
-    public float doorSpeed = 0.01f; // Скорость движения дверей
+    public float doorSpeed = 1.0f; // Скорость движения дверей
     public float doorWidth = 0.3f; // Расстояние, на которое двери должны двигаться
     public float waitTime = 2.0f; // время ожидания на этаже
 
@@ -28,14 +27,14 @@ public class ElevatorController : MonoBehaviour
     {
         if (floorNumber >= 0 && floorNumber < floors.Length)
         {
-            targetPosition = new Vector3(transform.position.x, floors[floorNumber].position.y, transform.position.z);
+            targetPosition = new Vector3(transform.position.x, floors[floorNumber].floorTransform.position.y, transform.position.z);
             StartCoroutine(MoveToTargetFloor());
         }
     }
 
     public void MoveUp()
     {
-        if (transform.position.y < floors[floors.Length - 1].position.y)
+        if (transform.position.y < floors[floors.Length - 1].floorTransform.position.y)
         {
             CallElevator(GetCurrentFloorNumber() + 1);
         }
@@ -43,7 +42,7 @@ public class ElevatorController : MonoBehaviour
 
     public void MoveDown()
     {
-        if (transform.position.y > floors[0].position.y)
+        if (transform.position.y > floors[0].floorTransform.position.y)
         {
             CallElevator(GetCurrentFloorNumber() - 1);
         }
@@ -51,11 +50,13 @@ public class ElevatorController : MonoBehaviour
 
     public void OpenDoor()
     {
+        isDoorOpen = true;
         StartCoroutine(OpenDoors());
     }
 
     public void CloseDoor()
     {
+        isDoorOpen = false;
         StartCoroutine(CloseDoors());
     }
 
@@ -66,7 +67,7 @@ public class ElevatorController : MonoBehaviour
 
         for (int i = 0; i < floors.Length; i++)
         {
-            float distance = Mathf.Abs(transform.position.y - floors[i].position.y);
+            float distance = Mathf.Abs(transform.position.y - floors[i].floorTransform.position.y);
             if (distance < closestDistance)
             {
                 closestDistance = distance;
@@ -84,10 +85,18 @@ public class ElevatorController : MonoBehaviour
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
             yield return null;
         }
-        
-        leftDoorClosedPosition = leftDoor.position;
-        rightDoorClosedPosition = rightDoor.position;
-        
+
+        if (isDoorOpen)
+        {
+            leftDoorClosedPosition = leftDoor.position + new Vector3(0, 0, doorWidth);
+            rightDoorClosedPosition = rightDoor.position + new Vector3(0, 0, -doorWidth);
+        }
+        else
+        {
+            leftDoorClosedPosition = leftDoor.position;
+            rightDoorClosedPosition = rightDoor.position; 
+        }
+
         yield return new WaitForSeconds(waitTime);
     }
 
