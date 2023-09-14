@@ -1,10 +1,24 @@
 using UnityEngine;
+using UnityEngine.Networking;
+using System.Collections;
+using System.IO;
+
+[System.Serializable]
+public class ServerResponse
+{
+    public int action;
+    public int[] outside_calls;
+    public int[] inside_calls;
+}
 
 public class GameController : MonoBehaviour
 {
     public int numberOfFloors = 10;
     public Floor[] floors;
     public ElevatorController elevatorController;
+    public string serverURL = "http://localhost:5000/get_action";
+    public float requestInterval = 0.1f;
+    private float timeSinceLastRequest = 0f;
 
     void Awake()
     {
@@ -12,7 +26,64 @@ public class GameController : MonoBehaviour
 		elevatorController.Floors = floors;
     }
 
-    void CreateFloors()
+    void Update()
+    {
+        timeSinceLastRequest += Time.deltaTime;
+
+        if (timeSinceLastRequest >= requestInterval)
+        {
+            timeSinceLastRequest = 0f;
+            RequestElevatorAction();
+        }
+    }
+
+    public void RequestElevatorAction()
+    {
+        StartCoroutine(GetActionFromServer());
+    }
+
+    private IEnumerator GetActionFromServer()
+    {
+        UnityWebRequest request = UnityWebRequest.Get(serverURL);
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError("Server request failed: " + request.error);
+        }
+        else
+        {
+            HandleServerResponse(request.downloadHandler.text);
+        }
+    }
+
+    private void HandleServerResponse(string jsonResponse)
+    {
+        ServerResponse response = JsonUtility.FromJson<ServerResponse>(jsonResponse);
+
+        for (int i = 0; i < response.outside_calls.Length; i++)
+        {
+			if (response.outside_calls[i] == 1 && response.inside_calls[i] == 1) 
+			{
+				floors[i].State = FloorState.CalledFromBoth;
+			} 
+			else if (response.outside_calls[i] == 1) 
+			{
+				floors[i].State = FloorState.CalledFromOutside;
+			} 
+			else if (response.inside_calls[i] == 1)
+			{
+				floors[i].State = FloorState.CalledFromInside;
+			}
+			else
+			{
+				floors[i].State = FloorState.None;
+			}
+        }
+        elevatorController.PerformAction(response.action);
+    }
+
+ 	void CreateFloors()
     {
         floors = new Floor[numberOfFloors];
         Vector3 startingPosition = this.transform.position;

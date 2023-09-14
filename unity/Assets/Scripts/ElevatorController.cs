@@ -23,6 +23,30 @@ public class ElevatorController : MonoBehaviour
 		leftDoorClosedPosition = leftDoor.position;
 		rightDoorClosedPosition = rightDoor.position;
 	}
+    
+    public void PerformAction(int action)
+    {
+        switch (action)
+        {
+            case -1:
+                break;
+            case 0:
+                MoveUp();
+                break;
+            case 1:
+                MoveDown();
+                break;
+            case 2:
+                CloseDoor();
+                break;
+            case 3:
+                OpenDoor();
+                break;
+            case 4:
+                break;
+        }
+    }
+
 
     public void CallElevator(int floorNumber)
     {

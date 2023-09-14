@@ -38,5 +38,7 @@ class UnityServer:
                 self.elevator.add_call(from_level, False, passenger)
                 self.state = self.elevator.get_state()
                 self.commands.pop(0)
+            else:
+                break
         self.step += 1
-        return action, self.state[0], self.state[1]
+        return action.value, self.state[0], self.state[1]

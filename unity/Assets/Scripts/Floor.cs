@@ -14,8 +14,8 @@ public enum FloorState
 [System.Serializable]
 public class Floor : MonoBehaviour
 {
-    public Transform floorTransform; // Позиция этажа
-    public int floorNumber; // Номер этажа
+    public Transform floorTransform;
+    public int floorNumber;
     public Renderer floorRenderer;
 	public TextMesh textMesh;
     
