@@ -85,10 +85,10 @@ public class GameController : MonoBehaviour
 
  	void CreateFloors()
     {
-        floors = new Floor[numberOfFloors];
+        floors = new Floor[numberOfFloors + 1];
         Vector3 startingPosition = this.transform.position;
 
-        for (int i = 0; i < numberOfFloors; i++)
+        for (int i = 0; i < numberOfFloors + 1; i++)
         {
             GameObject newFloorObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
             newFloorObject.name = "Floor " + (i);
@@ -103,13 +103,13 @@ public class GameController : MonoBehaviour
         	// Создаем 3D текст и присваиваем его этажу
    			GameObject textObj = new GameObject("FloorNumberText");
     		textObj.transform.parent = newFloorObject.transform;
-			float zShift = i + 1 >= 10 ? 0.3f : 0.15f;
+			float zShift = i >= 10 ? 0.3f : 0.15f;
     		textObj.transform.localPosition = new Vector3(-0.6f, 0.4f, zShift); 
     		textObj.transform.localEulerAngles = new Vector3(0, 90, 0); 
 			textObj.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f); 
 
     		TextMesh textMesh = textObj.AddComponent<TextMesh>();
-    		textMesh.text = (i + 1).ToString();
+    		textMesh.text = (i).ToString();
     		textMesh.fontSize = 12;
     		textMesh.color = Color.black;
 

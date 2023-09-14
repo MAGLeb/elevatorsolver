@@ -14,7 +14,7 @@ class Elevator:
         self.passengers = []
 
         self.weight = 0
-        self.current_level = 1
+        self.current_level = 0
         self.is_door_open = False
 
     def step(self, action: ActionType):
@@ -83,7 +83,7 @@ class Elevator:
         if self.is_door_open:
             reward -= RewardType.MOVE_WITH_OPEN_DOOR.value
 
-        if self.current_level == 1:
+        if self.current_level == 0:
             reward -= RewardType.MOVE_NEXT_TO_EDGE.value
         else:
             self.current_level -= 1

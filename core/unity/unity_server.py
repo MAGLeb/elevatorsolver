@@ -16,6 +16,7 @@ class UnityServer:
     def __init__(self):
         self.levels, self.commands = read_commands_from_file(FILENAME)
         self.agent = initialize_agent(self.levels, Environment.AGENT_TYPE)
+        self.agent.exploration_rate = 0
         self.max_steps = Environment.MAX_STEPS
         self.elevator = Elevator(self.levels, Environment.ELEVATOR_MAX_WEIGHT)
         self.state = self.elevator.get_state()

@@ -10,10 +10,9 @@ public class ElevatorController : MonoBehaviour
 	private Vector3 rightDoorClosedPosition;
     private bool isDoorOpen = false;
 
-    public float speed = 3.0f; // скорость лифта
-    public float doorSpeed = 1.0f; // Скорость движения дверей
+    public float speed = 5.0f; // скорость лифта
+    public float doorSpeed = 5.0f; // Скорость движения дверей
     public float doorWidth = 0.3f; // Расстояние, на которое двери должны двигаться
-    public float waitTime = 2.0f; // время ожидания на этаже
 
     private Vector3 targetPosition;
  
@@ -121,8 +120,6 @@ public class ElevatorController : MonoBehaviour
             leftDoorClosedPosition = leftDoor.position;
             rightDoorClosedPosition = rightDoor.position; 
         }
-
-        yield return new WaitForSeconds(waitTime);
     }
 
 	private IEnumerator OpenDoors()
