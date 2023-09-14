@@ -20,6 +20,8 @@ class Environment:
 
     CASE_NUMBER = os.environ.get('CASE_NUMBER', 0)
     AGENT_TYPE = AgentType(os.environ.get('AGENT_TYPE', "Q_TABLE"))
+    VALIDATION_TEST_NUMBER = 0
+    UNITY_SERVER_PORT = 5000
 
     @classmethod
     def get_input_train_params(cls):

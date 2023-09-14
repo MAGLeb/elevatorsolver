@@ -1,5 +1,3 @@
-import os
-
 from core.utils.environment import Environment
 from core.elevator import Elevator
 from core.passenger import Passenger
