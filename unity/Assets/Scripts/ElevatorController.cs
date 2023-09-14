@@ -16,7 +16,8 @@ public class ElevatorController : MonoBehaviour
     public float waitTime = 2.0f; // время ожидания на этаже
 
     private Vector3 targetPosition;
-    
+ 
+    public Floor[] Floors { get; set; }
     void Start()
 	{
 		leftDoorClosedPosition = leftDoor.position;
@@ -25,16 +26,16 @@ public class ElevatorController : MonoBehaviour
 
     public void CallElevator(int floorNumber)
     {
-        if (floorNumber >= 0 && floorNumber < floors.Length)
+        if (floorNumber >= 0 && floorNumber < Floors.Length)
         {
-            targetPosition = new Vector3(transform.position.x, floors[floorNumber].floorTransform.position.y, transform.position.z);
+            targetPosition = new Vector3(transform.position.x, Floors[floorNumber].transform.position.y - 0.5f, transform.position.z);
             StartCoroutine(MoveToTargetFloor());
         }
     }
 
     public void MoveUp()
     {
-        if (transform.position.y < floors[floors.Length - 1].floorTransform.position.y)
+        if (transform.position.y < Floors[Floors.Length - 1].transform.position.y)
         {
             CallElevator(GetCurrentFloorNumber() + 1);
         }
@@ -42,7 +43,7 @@ public class ElevatorController : MonoBehaviour
 
     public void MoveDown()
     {
-        if (transform.position.y > floors[0].floorTransform.position.y)
+        if (transform.position.y > Floors[0].transform.position.y)
         {
             CallElevator(GetCurrentFloorNumber() - 1);
         }
@@ -65,9 +66,9 @@ public class ElevatorController : MonoBehaviour
         float closestDistance = float.MaxValue;
         int closestFloorNumber = 0;
 
-        for (int i = 0; i < floors.Length; i++)
+        for (int i = 0; i < Floors.Length; i++)
         {
-            float distance = Mathf.Abs(transform.position.y - floors[i].floorTransform.position.y);
+            float distance = Mathf.Abs(transform.position.y - Floors[i].transform.position.y);
             if (distance < closestDistance)
             {
                 closestDistance = distance;
@@ -80,7 +81,7 @@ public class ElevatorController : MonoBehaviour
 
     private IEnumerator MoveToTargetFloor()
     {
-        while (Vector3.Distance(transform.position, targetPosition) > 0.1f)
+        while (Vector3.Distance(transform.position, targetPosition) > 0.0005f)
         {
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
             yield return null;

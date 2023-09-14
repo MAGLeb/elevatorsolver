@@ -17,6 +17,7 @@ public class Floor : MonoBehaviour
     public Transform floorTransform; // Позиция этажа
     public int floorNumber; // Номер этажа
     public Renderer floorRenderer;
+	public TextMesh textMesh;
     
     private FloorState _state = FloorState.None;
     
