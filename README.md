@@ -56,6 +56,3 @@ Feel free to contribute to the project. Raise an issue or submit a pull request.
 - [ ] Deep Q-Network Implementation
 - [ ] Policy Gradient Methods
 - [ ] Further Integration with Unity for Advanced Visualizations
-
-## License
-This project is licensed under the MIT License. See the LICENSE file for details.
