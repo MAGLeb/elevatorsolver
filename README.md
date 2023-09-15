@@ -11,9 +11,7 @@ In this repository, we focus on utilizing Reinforcement Learning (RF) agents to 
 
 Please note that the visualization does not depict individual humans, however, in the code, multiple humans can exist on the same level. Each human is assigned a specific weight, and the elevator has a defined `MAX_weight` that it can carry.
 
-
 ## Features
-
 ### Core Training Environment
 A foundational framework to generate various tests for training models with different parameters.
 
@@ -37,17 +35,16 @@ cd elevator_solver
 - create the **.env** (see the .env.example)
 - modify **environment.py** (/elevator_solver/core/utils/environment.py) to set up the expiriment
 
-### 3. Train the Model
+### 3. Generate tests, train & validate the Model
+python3 generate_cases.py
 python3 train.py
+python3 validate.py
 
-### 4. Validate the Model
-python3 train.py
-
-### 5. Visualize the resulted model
+### 4. Visualize the resulted model
 python3 server.py (start Falsk serveer to send action to Unity visualisation)
 start Unity project (/elevator_solver/unity/)
 
-### 6. Contributions
+### 5. Contributions
 Feel free to contribute to the project. Raise an issue or submit a pull request.
 
 ## Roadmap
