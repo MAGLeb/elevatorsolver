@@ -154,10 +154,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftDoor: {fileID: 199840449}
   rightDoor: {fileID: 1445739435}
-  speed: 3
-  doorSpeed: 1
+  speed: 15
+  doorSpeed: 15
   doorWidth: 0.3
-  waitTime: 2
 --- !u!4 &88492541
 Transform:
   m_ObjectHideFlags: 0
@@ -1616,6 +1615,8 @@ MonoBehaviour:
   numberOfFloors: 10
   floors: []
   elevatorController: {fileID: 88492540}
+  serverURL: http://localhost:5000/get_action
+  requestInterval: 0.1
 --- !u!4 &1377274261
 Transform:
   m_ObjectHideFlags: 0
