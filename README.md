@@ -2,7 +2,7 @@
 
 In this repository, we focus on utilizing Reinforcement Learning (RF) agents to solve the elevator problem. We explore different algorithms to train our agents, providing a rich environment for experimentation and learning.
 
-![Elevator Visualization](path_to_image/elevator_visualization.png)
+![Elevator Visualization](/unity/Recordings/readme.mp4)
 
 ## Features
 
