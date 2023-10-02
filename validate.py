@@ -2,7 +2,7 @@ import os
 
 from core.solution.utils import initialize_agent
 from core.utils.utils import read_commands_from_file, save_results
-from core.solution.validate import validate
+from core.solution.validate_agent import validate_agent
 from core.utils.environment import Environment
 
 case_path = Environment.get_case_path(Environment.CASE_NUMBER)

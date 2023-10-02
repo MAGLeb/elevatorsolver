@@ -1,8 +1,7 @@
 import os
 
 from core.solution.utils import initialize_agent
-from core.solution.q_table_agent.train import train as train_q_table
-from core.solution.q_table_agent.utils import calculate_exploration_fall
+from core.solution.train_agent import train_agent
 from core.utils.environment import Environment
 from core.utils.utils import read_commands_from_file, save_results
 
@@ -26,8 +25,7 @@ for i in range(Environment.NUMBER_TRAIN_PER_CASE):
     # LEARN
     print(f"Starting training Q-Table agent...")
     agent = initialize_agent(levels, Environment.AGENT_TYPE)
-    agent.exploration_fall = calculate_exploration_fall(Environment.MAX_STEPS)
-    reward = train_q_table(commands, levels, agent)
+    reward = train_agent(commands, levels, agent)
     print(f"Training completed with final reward: {reward[-1] if reward else 'N/A'}")
 
     # SAVE RESULTS

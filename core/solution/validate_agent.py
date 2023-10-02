@@ -4,7 +4,7 @@ from core.passenger import Passenger
 from core.types.time_wait_type import TimeWaitType
 
 
-def validate(commands, levels, agent):
+def validate_agent(commands, levels, agent):
     max_steps = Environment.MAX_STEPS
     max_weight = Environment.ELEVATOR_MAX_WEIGHT
 

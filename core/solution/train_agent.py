@@ -2,13 +2,9 @@ from core.utils.environment import Environment
 from core.elevator import Elevator
 from core.passenger import Passenger
 from core.types.time_wait_type import TimeWaitType
-from core.solution.q_table_agent.q_table_agent import LearningAgentQTable
 
 
-def train(commands, levels, agent):
-    if type(agent) != LearningAgentQTable:
-        raise ValueError(f"Can not train this type of agent: {type(agent)}")
-
+def train_agent(commands, levels, agent):
     max_steps = Environment.MAX_STEPS
     num_episodes = Environment.NUM_EPISODES
     max_weight = Environment.ELEVATOR_MAX_WEIGHT

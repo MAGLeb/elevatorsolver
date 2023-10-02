@@ -1,6 +1,5 @@
 from core.solution.agent import Agent
 from core.types.action_type import ActionType
-from core.utils.environment import Environment
 
 
 class LearningAgentBase(Agent):
@@ -15,7 +14,7 @@ class LearningAgentBase(Agent):
             return min(inside_call_levels)
         return max(outside_call_levels)
 
-    def go_down_or_up(self, current_level):
+    def _go_down_or_up(self, current_level):
         if current_level < self.level_to_go:
             return ActionType.UP
         else:
@@ -25,7 +24,7 @@ class LearningAgentBase(Agent):
         outside_calls, inside_calls, current_level, weight, is_opened = state
 
         if self.level_to_go is not None and current_level < self.level_to_go:
-            return self.go_down_or_up(current_level)
+            return self._go_down_or_up(current_level)
 
         if is_opened:
             return ActionType.CLOSE_DOOR
@@ -40,4 +39,13 @@ class LearningAgentBase(Agent):
             return ActionType.OPEN_DOOR
 
         self.level_to_go = self._find_level_to_go(outside_call_levels, inside_call_levels)
-        return self.go_down_or_up(current_level)
+        return self._go_down_or_up(current_level)
+
+    def save(self):
+        pass
+
+    def learn(self):
+        pass
+
+    def reset_exploration_rate(self):
+        pass

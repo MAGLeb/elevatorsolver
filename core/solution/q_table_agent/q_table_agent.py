@@ -3,17 +3,18 @@ import random
 import numpy as np
 
 from core.solution.agent import Agent
+from core.utils.environment import Environment
 from core.types.action_type import ActionType
-from core.solution.q_table_agent.utils import boolean_array_to_integer
+from core.solution.q_table_agent.utils import calculate_exploration_fall, boolean_array_to_integer
 
 
 class LearningAgentQTable(Agent):
-    def __init__(self, levels, learning_rate=0.1, discount_rate=0.9, exploration_rate=1, exploration_fall=0.975):
+    def __init__(self, levels, learning_rate=0.1, discount_rate=0.9, exploration_rate=1):
         super().__init__(levels)
         self.learning_rate = learning_rate
         self.discount_rate = discount_rate
         self.exploration_rate = exploration_rate
-        self.exploration_fall = exploration_fall
+        self.exploration_fall = calculate_exploration_fall(Environment.MAX_STEPS)
         self.q_table = np.zeros((levels, 2 ** levels, 2 ** levels, 8, 2, 5), dtype=np.int32)
 
     def save(self, filepath):
