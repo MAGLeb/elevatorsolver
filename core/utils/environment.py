@@ -9,11 +9,10 @@ load_dotenv()
 
 class Environment:
     PROJECT_PATH = os.environ.get('PROJECT_PATH')
-    INPUT_TRAIN_FILE = "input_train_params.txt"
 
     IS_PRODUCTION = os.environ.get('IS_PRODUCTION', 'False') == 'True'
     NUMBER_TRAIN_PER_CASE = 1000 if IS_PRODUCTION else 3
-    NUMBER_TEST_PER_CASE = 10 if IS_PRODUCTION else 1
+    NUMBER_VALIDATION_PER_CASE = 10 if IS_PRODUCTION else 1
     NUM_EPISODES = 100 if IS_PRODUCTION else 3
     MAX_STEPS = 86401
     ELEVATOR_MAX_WEIGHT = 680
@@ -22,14 +21,6 @@ class Environment:
     AGENT_TYPE = AgentType(os.environ.get('AGENT_TYPE', "Q_TABLE"))
     VALIDATION_TEST_NUMBER = 0
     UNITY_SERVER_PORT = 5000
-
-    @classmethod
-    def get_input_train_params(cls):
-        filepath = os.path.join(cls.PROJECT_PATH, "case_generation", cls.INPUT_TRAIN_FILE)
-        with open(filepath, 'r') as f:
-            params = f.readline().split()
-            params = list(map(int, params))
-        return params
 
     @classmethod
     def get_agent_path(cls):
