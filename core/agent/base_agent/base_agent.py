@@ -1,4 +1,4 @@
-from core.solution.agent import Agent
+from core.agent.agent import Agent
 from core.types.action_type import ActionType
 
 

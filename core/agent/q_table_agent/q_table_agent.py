@@ -2,10 +2,10 @@ import random
 
 import numpy as np
 
-from core.solution.agent import Agent
+from core.agent.agent import Agent
+from core.agent.utils import calculate_exploration_fall, boolean_array_to_integer
 from core.utils.environment import Environment
 from core.types.action_type import ActionType
-from core.solution.utils import calculate_exploration_fall, boolean_array_to_integer
 
 
 class LearningAgentQTable(Agent):

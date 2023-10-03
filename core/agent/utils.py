@@ -1,9 +1,9 @@
 import os
 import math
 
-from core.solution.base_agent.base_agent import LearningAgentBase
-from core.solution.q_table_agent.q_table_agent import LearningAgentQTable
-from core.solution.dql_agent.dql_agent import LearningAgentDQL
+from core.agent.base_agent.base_agent import LearningAgentBase
+from core.agent.q_table_agent.q_table_agent import LearningAgentQTable
+from core.agent.dql_agent.dql_agent import LearningAgentDQL
 from core.types.agent_type import AgentType
 from core.utils.environment import Environment
 

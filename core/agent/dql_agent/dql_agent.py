@@ -4,10 +4,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from core.solution.agent import Agent
+from core.agent.agent import Agent
+from core.agent.utils import calculate_exploration_fall
 from core.utils.environment import Environment
 from core.types.action_type import ActionType
-from core.solution.utils import calculate_exploration_fall
 
 
 class LearningAgentDQL(nn.Module, Agent):

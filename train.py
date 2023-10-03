@@ -1,7 +1,7 @@
 import os
 
-from core.solution.utils import initialize_agent
-from core.solution.train_agent import train_agent
+from core.agent.utils import initialize_agent
+from core.agent.train_agent import train_agent
 from core.utils.environment import Environment
 from core.utils.utils import read_commands_from_file, save_results
 

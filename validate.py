@@ -1,8 +1,8 @@
 import os
 
-from core.solution.utils import initialize_agent
+from core.agent.utils import initialize_agent
 from core.utils.utils import read_commands_from_file, save_results
-from core.solution.validate_agent import validate_agent
+from core.agent.validate_agent import validate_agent
 from core.utils.environment import Environment
 
 case_path = Environment.get_case_path(Environment.CASE_NUMBER)
@@ -21,7 +21,7 @@ for i in range(Environment.NUMBER_TEST_PER_CASE):
     # LEARN
     agent = initialize_agent(levels, Environment.AGENT_TYPE)
     agent.exploration_rate = 0
-    reward = validate(commands, levels, agent)
+    reward = validate_agent(commands, levels, agent)
 
     # SAVE RESULTS
     filename = os.path.join(results_path, f'result_{i}.txt')

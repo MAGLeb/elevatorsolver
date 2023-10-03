@@ -1,10 +1,10 @@
-from core.solution.utils import initialize_agent
-from core.utils.environment import Environment
-from core.utils.utils import read_commands_from_file
+from core.agent.utils import initialize_agent
 from core.elevator import Elevator
 from core.passenger import Passenger
 from core.types.time_wait_type import TimeWaitType
 from core.types.action_type import ActionType
+from core.utils.environment import Environment
+from core.utils.utils import read_commands_from_file
 
 TEST_NUMBER = Environment.VALIDATION_TEST_NUMBER
 CASE_PATH = Environment.get_case_path(Environment.CASE_NUMBER)
