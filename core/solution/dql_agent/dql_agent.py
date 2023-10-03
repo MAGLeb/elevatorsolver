@@ -51,13 +51,13 @@ class LearningAgentDQL(nn.Module, Agent):
     def learn(self, state, reward, action, next_state):
         state = self._convert_elevator_state_to_tensor(state)
         next_state = self._convert_elevator_state_to_tensor(next_state)
-        reward = torch.Tensor(reward)
-        action = torch.LongTensor(action)
+        reward = torch.tensor([reward])
+        action = torch.tensor([action])
 
         q_predicted = self.forward(state)
         q_predicted_actions = q_predicted.gather(1, action.unsqueeze(1)).squeeze()
 
-        q_next = self(next_state).detach()
+        q_next = self.forward(next_state).detach()
         q_target = reward + self.gamma * q_next.max(1)[0]
 
         loss = self.loss_function(q_predicted_actions, q_target)
@@ -71,7 +71,8 @@ class LearningAgentDQL(nn.Module, Agent):
     @staticmethod
     def _convert_elevator_state_to_tensor(state):
         state = [item for sublist in state for item in (sublist if isinstance(sublist, list) else [sublist])]
-        state = torch.Tensor(state, dtype=torch.float32)
+        state = torch.tensor(state, dtype=torch.float32)
+        state = state.unsqueeze(0)
         return state
 
     def forward(self, x):
