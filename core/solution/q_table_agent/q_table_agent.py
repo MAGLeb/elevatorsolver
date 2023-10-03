@@ -5,7 +5,7 @@ import numpy as np
 from core.solution.agent import Agent
 from core.utils.environment import Environment
 from core.types.action_type import ActionType
-from core.solution.q_table_agent.utils import calculate_exploration_fall, boolean_array_to_integer
+from core.solution.utils import calculate_exploration_fall, boolean_array_to_integer
 
 
 class LearningAgentQTable(Agent):
