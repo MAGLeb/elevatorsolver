@@ -5,16 +5,15 @@ import torch.nn as nn
 import torch.optim as optim
 
 from core.agent.agent import Agent
-from core.agent.utils import calculate_exploration_fall
-from core.utils.environment import Environment
 from core.types.action_type import ActionType
 
 
 class LearningAgentDQL(nn.Module, Agent):
-    def __init__(self, levels, learning_rate=0.001, exploration_rate=1):
-        super().__init__(levels)
+    def __init__(self, learning_rate=0.001, exploration_rate=1):
+        nn.Module.__init__(self)
+        Agent.__init__(self)
 
-        self.fc1 = nn.Linear(levels * 2 + 3, 1024)
+        self.fc1 = nn.Linear(self.levels * 2 + 3, 1024)
         self.fc2 = nn.Linear(1024, 1024)
         self.fc3 = nn.Linear(1024, 5)
 
@@ -24,7 +23,6 @@ class LearningAgentDQL(nn.Module, Agent):
 
         self.gamma = 0.99
         self.exploration_rate = exploration_rate
-        self.exploration_fall = calculate_exploration_fall(Environment.MAX_STEPS)
 
     def load(self, filepath):
         checkpoint = torch.load(filepath)
@@ -41,7 +39,7 @@ class LearningAgentDQL(nn.Module, Agent):
         self.exploration_rate *= self.exploration_fall
         random_action = random.random()
         if random_action < self.exploration_rate:
-            return ActionType(random.randint(0, ActionType.__len__() - 1))
+            return random.choice(list(ActionType))
 
         state = self._convert_elevator_state_to_tensor(state)
         output = self.forward(state)

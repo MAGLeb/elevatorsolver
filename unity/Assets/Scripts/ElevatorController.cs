@@ -27,8 +27,6 @@ public class ElevatorController : MonoBehaviour
     {
         switch (action)
         {
-            case -1:
-                break;
             case 0:
                 MoveUp();
                 break;

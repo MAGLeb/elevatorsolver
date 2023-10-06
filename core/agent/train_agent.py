@@ -4,21 +4,18 @@ from core.passenger import Passenger
 from core.types.time_wait_type import TimeWaitType
 
 
-def train_agent(commands, levels, agent):
-    max_steps = Environment.MAX_STEPS
-    num_episodes = Environment.NUM_EPISODES
-    max_weight = Environment.ELEVATOR_MAX_WEIGHT
+def train_agent(commands, agent):
     total_rewards = []
 
-    for episode in range(num_episodes):
+    for episode in range(Environment.NUM_EPISODES):
         commands_copy = commands.copy()
         agent.reset_exploration_rate()
-        elevator = Elevator(levels, max_weight)
+        elevator = Elevator()
         state = elevator.get_state()
         total_reward = 0
         steps_to_wait = 0
 
-        for step in range(max_steps):
+        for step in range(Environment.STEPS):
             if steps_to_wait == 0:
                 action = agent.choose_action(state)
                 next_state, reward = elevator.step(action)
@@ -30,7 +27,7 @@ def train_agent(commands, levels, agent):
 
             while len(commands_copy) > 0:
                 time, from_level, to_level, weight_passenger = commands_copy[0]
-                if (step % max_steps) != int(time):
+                if (step % Environment.STEPS) != int(time):
                     break
                 passenger = Passenger(from_level, to_level, weight_passenger)
                 elevator.add_call(from_level, False, passenger)
@@ -40,7 +37,5 @@ def train_agent(commands, levels, agent):
         total_rewards.append(total_reward)
         print(f"Episode {episode + 1}: Total Reward: {total_reward}")
 
-    agent.save(Environment.get_agent_path())
-    print(f"max:{max(total_rewards)}, average:{sum(total_rewards) / num_episodes}")
-    print("Training finished.")
+    agent.save(Environment.MODEL_FILE_PATH)
     return total_rewards

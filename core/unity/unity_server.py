@@ -24,7 +24,7 @@ class UnityServer:
         self.step = 0
 
     def get_next_action(self):
-        action = ActionType.EMPTY
+        action = ActionType.WAIT
         if self.steps_to_wait == 0:
             action = self.agent.choose_action(self.state)
             next_state, _ = self.elevator.step(action)

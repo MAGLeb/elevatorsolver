@@ -63,6 +63,7 @@ Desktop.ini
 
 # === Logs ===
 *.log
+wandb
 
 # === Others ===
 # Add files that you want to exclude. For example:

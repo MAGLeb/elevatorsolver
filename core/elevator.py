@@ -4,13 +4,14 @@ from core.level import Level
 from core.types.action_type import ActionType
 from core.types.reward_type import RewardType
 from core.passenger import Passenger
+from core.utils.environment import Environment
 
 
 class Elevator:
-    def __init__(self, levels, max_weight):
-        self.max_levels = levels
-        self.max_weight = max_weight
-        self.levels = [Level(i) for i in range(levels + 1)]
+    def __init__(self):
+        self.max_levels = Environment.LEVELS
+        self.max_weight = Environment.ELEVATOR_WEIGHT
+        self.levels = [Level(i) for i in range(self.max_levels + 1)]
         self.passengers = []
 
         self.weight = 0

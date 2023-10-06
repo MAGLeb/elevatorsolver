@@ -7,6 +7,7 @@ import pandas as pd
 
 app = Flask(__name__)
 
+# TODO rewrite file
 CASE_PATHS = [
     f'../cases/case{i}/result_train/' for i in range(1, 4)
 ]

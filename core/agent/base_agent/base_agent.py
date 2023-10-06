@@ -3,8 +3,8 @@ from core.types.action_type import ActionType
 
 
 class LearningAgentBase(Agent):
-    def __init__(self, levels):
-        super().__init__(levels)
+    def __init__(self):
+        super().__init__()
 
         self.level_to_go = None
 

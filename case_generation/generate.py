@@ -1,9 +1,10 @@
-import os
+import os.path
 import random
 
 import numpy as np
 
-from case_generation.time_distribution import inverse_cdf
+from case_generation.time_distribution import DistributionCalculator
+from core.utils.environment import Environment
 
 
 def seconds_format(random_value):
@@ -11,10 +12,11 @@ def seconds_format(random_value):
 
 
 def generate_time_call(n):
+    calculator = DistributionCalculator()
     calls = []
     uniform_random_values = np.random.uniform(0, 1, n)
     for u in uniform_random_values:
-        custom_random_value = inverse_cdf(u)
+        custom_random_value = calculator.inverse_cdf(u)
         seconds = seconds_format(custom_random_value)
         calls.append(seconds)
 
@@ -41,9 +43,9 @@ def choose_level(tb, bt, p, tb_i, bt_i):
     return level_pair, tb_i, bt_i
 
 
-def generate_levels(n, max_level, times):
+def generate_levels(n, times):
     times_half = int(n / 2)
-    levels = [random.randint(2, max_level) for _ in range(times_half)]
+    levels = [random.randint(2, Environment.LEVELS) for _ in range(times_half)]
     tb = [[level, 1] for level in levels]
     bt = [list(reversed(pair)) for pair in tb]
     tb = random.sample(tb, len(tb))
@@ -68,25 +70,26 @@ def generate_levels(n, max_level, times):
     return level_pairs
 
 
-def generate_test_sample(number_levels, number_people, number_elevators, filename):
-    n = int(number_levels * number_people)
+def generate_test_sample(filename):
+    n = int(Environment.LEVELS * Environment.PASSABILITY)
     if n % 2 == 1:
         n += 1
     times = generate_time_call(n)
-    level_pairs = generate_levels(n, number_levels, times)
+    level_pairs = generate_levels(n, times)
 
     with open(filename, 'w') as f:
-        f.write(f"{n} {number_levels} {number_people} {number_elevators}\n")
+        f.write(f"{n}\n")
         for i in range(n):
             weight_of_passenger = generate_weight_passenger()
             f.write(f"{times[i]} {level_pairs[i][0]} {level_pairs[i][1]} {weight_of_passenger}\n")
 
 
-def generate_tests(path, filename, number_tests, number_levels, number_people, number_elevators):
-    os.makedirs(path, exist_ok=True)
-
+def generate_tests(path, filename, number_tests):
     for j in range(number_tests):
         path_filename = f"{path}/{filename}_{j + 1}.txt"
 
-        print(f"Generating sample {j + 1} to {path_filename}")
-        generate_test_sample(number_levels, number_people, number_elevators, path_filename)
+        if not os.path.exists(path_filename):
+            print(f"Generating test {j + 1} for {filename} to {path_filename}")
+            generate_test_sample(path_filename)
+        else:
+            print(f"Test {j + 1} for {filename} exists.")

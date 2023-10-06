@@ -1,7 +1,7 @@
 def save_results(filename, result):
     print(f"Saving results to {filename}")
-    with open(filename, 'w') as f:
-        f.writelines(map(lambda x: str(x) + '\n', result))
+    with open(filename, 'a') as f:
+        f.write(str(result) + '\n')
 
 
 def read_commands_from_file(filename):
@@ -10,9 +10,8 @@ def read_commands_from_file(filename):
     commands = []
     with open(filename, 'r') as f:
         line = f.readline()
-        n, levels, _, _, _, _ = line.split()
+        n = line.split()[0]
         n = int(n)
-        levels = int(levels)
         while n != 0:
             line = f.readline().strip().split()
             time, from_level, to_level, weight = line
@@ -24,4 +23,4 @@ def read_commands_from_file(filename):
 
     print(f"Read {len(commands)} commands from test data.")
 
-    return levels, commands
+    return commands

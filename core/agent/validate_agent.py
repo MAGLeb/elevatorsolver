@@ -4,11 +4,8 @@ from core.passenger import Passenger
 from core.types.time_wait_type import TimeWaitType
 
 
-def validate_agent(commands, levels, agent):
-    max_steps = Environment.MAX_STEPS
-    max_weight = Environment.ELEVATOR_MAX_WEIGHT
-
-    elevator = Elevator(levels, max_weight)
+def validate_agent(commands, agent):
+    elevator = Elevator()
     state = elevator.get_state()
     total_reward = 0
     steps_to_wait = 0

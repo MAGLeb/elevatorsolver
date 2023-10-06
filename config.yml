@@ -1,0 +1,12 @@
+case_params:
+  levels: 10
+  passability: 720
+  elevators: 1
+  train_tests: 5
+  validation_tests: 1
+
+experiment_params:
+  experiment_name: WBdgeel
+  agent_type: "DQL" # /core/types/agent_type.py
+  episodes: 1
+  elevator_weight: 680
