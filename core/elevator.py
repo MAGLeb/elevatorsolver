@@ -11,7 +11,7 @@ class Elevator:
     def __init__(self):
         self.max_levels = Environment.LEVELS
         self.max_weight = Environment.ELEVATOR_WEIGHT
-        self.levels = [Level(i) for i in range(self.max_levels + 1)]
+        self.levels = [Level(i) for i in range(self.max_levels)]
         self.passengers = []
 
         self.weight = 0
@@ -73,7 +73,7 @@ class Elevator:
         if self.is_door_open:
             reward -= RewardType.MOVE_WITH_OPEN_DOOR.value
 
-        if self.current_level == self.max_levels:
+        if self.current_level == self.max_levels - 1:
             reward -= RewardType.MOVE_NEXT_TO_EDGE.value
         else:
             self.current_level += 1
@@ -114,8 +114,6 @@ class Elevator:
 
         # 3. negative reward
         if reward == 0:
-            if self.is_door_open:
-                reward -= RewardType.OPEN_ON_EMPTY_LEVEL.value
             reward -= RewardType.OPEN_ON_EMPTY_LEVEL.value
         self.is_door_open = True
 
@@ -124,7 +122,7 @@ class Elevator:
     def _wait(self):
         reward = 0
         empty_levels = [level for level in self.levels if level.is_empty()]
-        if len(empty_levels) == self.max_levels + 1:
+        if len(empty_levels) == self.max_levels:
             reward += RewardType.WAIT_WHEN_NO_CALLS.value
         else:
             reward -= RewardType.WAIT_WHEN_CALLS.value

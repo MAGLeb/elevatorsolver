@@ -41,10 +41,10 @@ class LearningAgentBase(Agent):
         self.level_to_go = self._find_level_to_go(outside_call_levels, inside_call_levels)
         return self._go_down_or_up(current_level)
 
-    def save(self):
+    def save(self, filepath):
         pass
 
-    def learn(self):
+    def learn(self, state, reward, action, next_state):
         pass
 
     def reset_exploration_rate(self):

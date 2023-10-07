@@ -4,7 +4,7 @@ from enum import Enum
 class RewardType(Enum):
     WAIT_WHEN_NO_CALLS = 10
     CLOSE_DOOR = 15
-    GET_PASSENGER = 50
+    GET_PASSENGER = 100
     DELIVER_PASSENGER = 100
 
     PASSENGER_WAIT = 2

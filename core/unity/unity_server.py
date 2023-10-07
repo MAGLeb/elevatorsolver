@@ -1,3 +1,5 @@
+import os
+
 from core.agent.utils import initialize_agent
 from core.elevator import Elevator
 from core.passenger import Passenger
@@ -6,19 +8,14 @@ from core.types.action_type import ActionType
 from core.utils.environment import Environment
 from core.utils.utils import read_commands_from_file
 
-TEST_NUMBER = Environment.VALIDATION_TEST_NUMBER
-CASE_PATH = Environment.get_case_path(Environment.CASE_NUMBER)
-TEST_PATH = Environment.get_test_path(CASE_PATH)
-FILENAME = f"{TEST_PATH}/test_{TEST_NUMBER}.txt"
-
 
 class UnityServer:
     def __init__(self):
-        self.levels, self.commands = read_commands_from_file(FILENAME)
-        self.agent = initialize_agent(self.levels, Environment.AGENT_TYPE)
+        self.commands = read_commands_from_file(
+            os.path.join(Environment.VALIDATE_TESTS_PATH, 'validation_1.txt'))
+        self.agent = initialize_agent()
         self.agent.exploration_rate = 0
-        self.max_steps = Environment.MAX_STEPS
-        self.elevator = Elevator(self.levels, Environment.ELEVATOR_MAX_WEIGHT)
+        self.elevator = Elevator()
         self.state = self.elevator.get_state()
         self.steps_to_wait = 0
         self.step = 0
@@ -34,7 +31,7 @@ class UnityServer:
 
         while len(self.commands) > 0:
             time, from_level, to_level, weight_passenger = self.commands[0]
-            if (self.step % self.max_steps) == int(time):
+            if (self.step % Environment.STEPS) == int(time):
                 passenger = Passenger(from_level, to_level, weight_passenger)
                 self.elevator.add_call(from_level, False, passenger)
                 self.state = self.elevator.get_state()

@@ -104,8 +104,8 @@ class Environment:
         os.makedirs(results_path, exist_ok=True)
 
         cls.MODEL_FILE_PATH = os.path.join(experiment_path, "model.npy")
-        cls.VALIDATE_FILE_PATH = os.path.join(results_path, "validation.txt")
-        cls.TRAIN_FILE_PATH = os.path.join(results_path, "train.txt")
+        cls.VALIDATE_RESULTS_FILE_PATH = os.path.join(results_path, "validation.txt")
+        cls.TRAIN_RESULTS_FILE_PATH = os.path.join(results_path, "train.txt")
 
 
 Environment._initialisation_environment()

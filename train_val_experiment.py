@@ -1,5 +1,3 @@
-import os
-
 import wandb
 
 from core.agent.utils import initialize_agent
@@ -15,7 +13,7 @@ print(f"Training settings:"
       f" AGENT TYPE = {Environment.AGENT_TYPE.value},"
       f" NUMBER ELEVATORS = {Environment.ELEVATORS}, ")
 
-wandb.init(project="ElevatorSolver", name=f"{Environment.AGENT_TYPE}_{Environment.EXPERIMENT_NAME}")
+wandb.init(project="ElevatorSolver", name=f"{Environment.AGENT_TYPE.value}_{Environment.EXPERIMENT_NAME}")
 
 for i in range(Environment.NUMBER_TRAIN_PER_CASE):
     print(f"\nProcessing test {i + 1} out of {Environment.NUMBER_TRAIN_PER_CASE}...")
@@ -25,32 +23,29 @@ for i in range(Environment.NUMBER_TRAIN_PER_CASE):
     commands = read_commands_from_file(filename)
 
     # LEARN
-    print(f"Starting training Q-Table agent...")
+    print(f"Starting training {Environment.AGENT_TYPE.value} agent...")
     agent = initialize_agent()
     train_reward = train_agent(commands, agent)
     train_average_reward = sum(train_reward) / Environment.NUM_EPISODES
     print(f"Training completed with final reward: {train_reward[-1] if train_reward else 'N/A'}")
 
+    # VALIDATION
+    val_rewards = []
+    for j in range(Environment.NUMBER_VALIDATION_PER_CASE):
+        filename = f"{Environment.VALIDATE_TESTS_PATH}/validation_{j + 1}.txt"
+        val_commands = read_commands_from_file(filename)
+        val_reward = validate_agent(val_commands, agent)
+        val_rewards.append(val_reward)
+    val_average_reward = sum(val_rewards) / len(val_rewards)
+
     # SAVE RESULTS
-    filename = os.path.join(Environment.TRAIN_RESULTS_FILE_PATH, f'train.txt')
-    save_results(filename, train_average_reward)
+    save_results(Environment.TRAIN_RESULTS_FILE_PATH, train_average_reward)
+    save_results(Environment.VALIDATE_RESULTS_FILE_PATH, val_average_reward)
 
-    if (i + 1) % 5 == 0:
-        val_rewards = []
-        for j in range(Environment.NUMBER_VALIDATION_PER_CASE):
-            filename = f"{Environment.VALIDATE_TESTS_PATH}/validation_{j + 1}.txt"
-            val_commands = read_commands_from_file(filename)
-            val_reward = validate_agent(val_commands, agent)
-            val_rewards.append(val_reward)
-        val_average_reward = sum(val_rewards) / len(val_rewards)
-
-        filename = os.path.join(Environment.VALIDATE_RESULTS_FILE_PATH, f'validation.txt')
-        save_results(filename, val_average_reward)
-
-        wandb.log({
-            "train_average_reward": train_average_reward,
-            "val_average_reward": val_average_reward
-        })
+    wandb.log({
+        "train_average_reward": train_average_reward,
+        "val_average_reward": val_average_reward
+    })
 
     print(f"Test {i + 1} processing completed!")
 

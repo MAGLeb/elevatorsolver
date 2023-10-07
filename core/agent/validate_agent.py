@@ -1,3 +1,5 @@
+import wandb
+
 from core.utils.environment import Environment
 from core.elevator import Elevator
 from core.passenger import Passenger
@@ -10,7 +12,7 @@ def validate_agent(commands, agent):
     total_reward = 0
     steps_to_wait = 0
 
-    for step in range(max_steps):
+    for step in range(Environment.STEPS):
         if steps_to_wait == 0:
             action = agent.choose_action(state)
             next_state, reward = elevator.step(action)
@@ -21,7 +23,7 @@ def validate_agent(commands, agent):
 
         while len(commands) > 0:
             time, from_level, to_level, weight_passenger = commands[0]
-            if (step % max_steps) != int(time):
+            if (step % Environment.STEPS) != int(time):
                 break
             passenger = Passenger(from_level, to_level, weight_passenger)
             elevator.add_call(from_level, False, passenger)
@@ -31,4 +33,4 @@ def validate_agent(commands, agent):
     print(f"Total Reward: {total_reward}")
     print("Testing finished.")
 
-    return [total_reward]
+    return total_reward

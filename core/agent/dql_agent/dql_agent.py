@@ -13,9 +13,8 @@ class LearningAgentDQL(nn.Module, Agent):
         nn.Module.__init__(self)
         Agent.__init__(self)
 
-        self.fc1 = nn.Linear(self.levels * 2 + 3, 1024)
-        self.fc2 = nn.Linear(1024, 1024)
-        self.fc3 = nn.Linear(1024, 5)
+        self.fc1 = nn.Linear(self.levels * 2 + 3, 512)
+        self.fc2 = nn.Linear(512, 5)
 
         self.relu = nn.LeakyReLU()
         self.loss_function = nn.MSELoss()
@@ -50,7 +49,7 @@ class LearningAgentDQL(nn.Module, Agent):
         state = self._convert_elevator_state_to_tensor(state)
         next_state = self._convert_elevator_state_to_tensor(next_state)
         reward = torch.tensor([reward])
-        action = torch.tensor([action])
+        action = torch.tensor([action.value])
 
         q_predicted = self.forward(state)
         q_predicted_actions = q_predicted.gather(1, action.unsqueeze(1)).squeeze()
@@ -75,5 +74,4 @@ class LearningAgentDQL(nn.Module, Agent):
 
     def forward(self, x):
         x = self.relu(self.fc1(x))
-        x = self.relu(self.fc2(x))
-        return self.fc3(x)
+        return self.fc2(x)

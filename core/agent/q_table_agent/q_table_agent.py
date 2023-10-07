@@ -8,6 +8,7 @@ from core.types.action_type import ActionType
 
 class LearningAgentQTable(Agent):
     def __init__(self, learning_rate=0.1, discount_rate=0.9, exploration_rate=1):
+        Agent.__init__(self)
         self.learning_rate = learning_rate
         self.discount_rate = discount_rate
         self.exploration_rate = exploration_rate

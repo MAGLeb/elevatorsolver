@@ -6,13 +6,14 @@ import numpy as np
 from case_generation.time_distribution import DistributionCalculator
 from core.utils.environment import Environment
 
+calculator = DistributionCalculator()
+
 
 def seconds_format(random_value):
     return int(random_value * 86400 / 24)
 
 
 def generate_time_call(n):
-    calculator = DistributionCalculator()
     calls = []
     uniform_random_values = np.random.uniform(0, 1, n)
     for u in uniform_random_values:
@@ -20,6 +21,7 @@ def generate_time_call(n):
         seconds = seconds_format(custom_random_value)
         calls.append(seconds)
 
+    calls.sort()
     return calls
 
 
@@ -46,7 +48,7 @@ def choose_level(tb, bt, p, tb_i, bt_i):
 def generate_levels(n, times):
     times_half = int(n / 2)
     levels = [random.randint(2, Environment.LEVELS) for _ in range(times_half)]
-    tb = [[level, 1] for level in levels]
+    tb = [[level - 1, 0] for level in levels]
     bt = [list(reversed(pair)) for pair in tb]
     tb = random.sample(tb, len(tb))
     bt = random.sample(bt, len(bt))
