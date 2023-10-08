@@ -4,9 +4,8 @@ case_params:
   passability: 720
   train_tests: 12
   validation_tests: 1
-
 experiment_params:
   agent_type: DQL
   elevator_weight: 680
-  episodes: 10
+  episodes: 100
   experiment_name: qeQp6bg
