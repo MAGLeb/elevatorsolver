@@ -9,7 +9,6 @@ def train_agent(commands, agent):
 
     for episode in range(Environment.NUM_EPISODES):
         commands_copy = commands.copy()
-        agent.reset_exploration_rate()
         elevator = Elevator()
         state = elevator.get_state()
         total_reward = 0
