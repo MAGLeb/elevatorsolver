@@ -46,6 +46,3 @@ class LearningAgentBase(Agent):
 
     def learn(self, state, reward, action, next_state):
         pass
-
-    def reset_exploration_rate(self):
-        pass

@@ -23,10 +23,6 @@ class Agent(ABC):
     def learn(self, *args, **params):
         pass
 
-    @abstractmethod
-    def reset_exploration_rate(self, *args, **params):
-        pass
-
     @staticmethod
     def calculate_exploration_fall():
         """

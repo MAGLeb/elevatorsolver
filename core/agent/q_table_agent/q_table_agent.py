@@ -20,9 +20,6 @@ class LearningAgentQTable(Agent):
     def load(self, filepath):
         self.q_table = np.load(filepath)
 
-    def reset_exploration_rate(self):
-        self.exploration_rate = 1
-
     def choose_action(self, state) -> ActionType:
         self.exploration_rate *= self.exploration_fall
         random_action = random.random()

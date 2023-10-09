@@ -30,6 +30,7 @@ for i in range(Environment.NUMBER_TRAIN_PER_CASE):
     print(f"Training completed with final reward: {train_reward[-1] if train_reward else 'N/A'}")
 
     # VALIDATION
+    max_val_reward = -float('inf')
     val_rewards = []
     for j in range(Environment.NUMBER_VALIDATION_PER_CASE):
         filename = f"{Environment.VALIDATE_TESTS_PATH}/validation_{j + 1}.txt"
@@ -41,6 +42,10 @@ for i in range(Environment.NUMBER_TRAIN_PER_CASE):
     # SAVE RESULTS
     save_results(Environment.TRAIN_RESULTS_FILE_PATH, train_average_reward)
     save_results(Environment.VALIDATE_RESULTS_FILE_PATH, val_average_reward)
+
+    if val_average_reward > max_val_reward:
+        max_val_reward = val_average_reward
+        agent.save(Environment.MODEL_FILE_PATH)
 
     wandb.log({
         "train_average_reward": train_average_reward,

@@ -26,7 +26,7 @@ class ReplayBuffer:
 
 
 class LearningAgentDQL(nn.Module, Agent):
-    def __init__(self, learning_rate=0.001, exploration_rate=1, buffer_size=10000, batch_size=64):
+    def __init__(self, learning_rate=0.0001, exploration_rate=1, buffer_size=45000, batch_size=64):
         nn.Module.__init__(self)
         Agent.__init__(self)
 
@@ -94,9 +94,6 @@ class LearningAgentDQL(nn.Module, Agent):
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
-
-    def reset_exploration_rate(self):
-        self.exploration_rate = 1
 
     def _convert_elevator_state_to_tensor(self, state):
         state = [item for sublist in state for item in (sublist if isinstance(sublist, list) else [sublist])]

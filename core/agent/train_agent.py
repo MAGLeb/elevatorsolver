@@ -36,5 +36,4 @@ def train_agent(commands, agent):
         total_rewards.append(total_reward)
         print(f"Episode {episode + 1}: Total Reward: {total_reward}")
 
-    agent.save(Environment.MODEL_FILE_PATH)
     return total_rewards
