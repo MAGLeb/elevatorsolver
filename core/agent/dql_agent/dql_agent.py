@@ -49,7 +49,7 @@ class LearningAgentDQL(nn.Module, Agent):
         self.exploration_rate = exploration_rate
 
         self.to(self.device)
-        self.log_model_architecture()
+        self.log_model_params()
 
     def log_model_params(self):
         architecture_str = []
