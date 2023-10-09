@@ -28,7 +28,4 @@ def validate_agent(commands, agent):
             state = elevator.get_state()
             commands.pop(0)
 
-    print(f"Total Reward: {total_reward}")
-    print("Testing finished.")
-
     return total_reward

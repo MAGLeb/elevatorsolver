@@ -1,6 +1,7 @@
 import random
 from collections import namedtuple, deque
 
+import wandb
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -30,6 +31,8 @@ class LearningAgentDQL(nn.Module, Agent):
         nn.Module.__init__(self)
         Agent.__init__(self)
 
+        self.learning_rate = learning_rate
+        self.buffer_size = buffer_size
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.buffer = ReplayBuffer(buffer_size)
@@ -46,6 +49,32 @@ class LearningAgentDQL(nn.Module, Agent):
         self.exploration_rate = exploration_rate
 
         self.to(self.device)
+        self.log_model_architecture()
+
+    def log_model_params(self):
+        architecture_str = []
+
+        for layer in self.children():
+            if isinstance(layer, nn.Linear):
+                layer_str = f"Linear({layer.in_features}, {layer.out_features})"
+            elif isinstance(layer, nn.Conv2d):
+                layer_str = f"Conv2d({layer.in_channels}, {layer.out_channels}, kernel_size={layer.kernel_size})"
+            elif isinstance(layer, nn.Dropout):
+                layer_str = f"Dropout(p={layer.p})"
+            elif isinstance(layer, nn.ReLU):
+                layer_str = "ReLU"
+            elif isinstance(layer, nn.BatchNorm2d):
+                layer_str = f"BatchNorm2d({layer.num_features})"
+            else:
+                layer_str = f"UnknownLayer({type(layer).__name__})"
+
+            architecture_str.append(layer_str)
+
+        architecture = " -> ".join(architecture_str)
+        wandb.config.architecture = architecture
+        wandb.config.learning_rate = self.learning_rate
+        wandb.config.buffer_size = self.buffer_size
+        wandb.config.batch_size = self.batch_size
 
     def load(self, filepath):
         checkpoint = torch.load(filepath)
