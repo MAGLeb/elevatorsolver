@@ -45,7 +45,7 @@ for i in range(Environment.NUMBER_TRAIN_PER_CASE):
     for j in range(Environment.NUMBER_VALIDATION_PER_CASE):
         filename = f"{Environment.VALIDATE_TESTS_PATH}/validation_{j + 1}.txt"
         val_commands = read_commands_from_file(filename)
-        val_reward = run_episode(agent, commands)
+        val_reward = run_episode(agent, val_commands)
         val_rewards.append(val_reward)
     val_average_reward = sum(val_rewards) / len(val_rewards)
     print(f"Validating completed with average reward: {val_average_reward}")
