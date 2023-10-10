@@ -7,5 +7,5 @@ case_params:
 experiment_params:
   agent_type: DQL
   elevator_weight: 680
-  episodes: 50
-  experiment_name: RkkIhYG
+  episodes: 15
+  experiment_name: a0CeDG3

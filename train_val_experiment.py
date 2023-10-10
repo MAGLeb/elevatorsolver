@@ -4,7 +4,7 @@ from core.agent.utils import initialize_agent
 from core.agent.train_agent import train_agent
 from core.utils.environment import Environment
 from core.utils.utils import read_commands_from_file, save_results
-from core.agent.validate_agent import validate_agent
+from core.agent.utils import run_episode
 from case_generation.generate import generate_tests
 
 
@@ -45,7 +45,7 @@ for i in range(Environment.NUMBER_TRAIN_PER_CASE):
     for j in range(Environment.NUMBER_VALIDATION_PER_CASE):
         filename = f"{Environment.VALIDATE_TESTS_PATH}/validation_{j + 1}.txt"
         val_commands = read_commands_from_file(filename)
-        val_reward = validate_agent(val_commands, agent)
+        val_reward = run_episode(agent, commands)
         val_rewards.append(val_reward)
     val_average_reward = sum(val_rewards) / len(val_rewards)
     print(f"Validating completed with average reward: {val_average_reward}")

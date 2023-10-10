@@ -16,3 +16,9 @@ class Level:
 
     def set_inside_elevator_call(self):
         self.type[1] = 1
+
+    def update_types(self):
+        if self.is_empty():
+            self.type = [0, 0]
+        else:
+            self.type = [1, 0]

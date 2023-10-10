@@ -12,13 +12,14 @@ from core.utils.utils import read_commands_from_file
 class UnityServer:
     def __init__(self):
         self.commands = read_commands_from_file(
-            os.path.join(Environment.VALIDATE_TESTS_PATH, 'validation_1.txt'))
+            os.path.join(Environment.VALIDATE_TESTS_PATH, 'validation_4.txt'))
         self.agent = initialize_agent()
         self.agent.exploration_rate = 0
         self.elevator = Elevator()
         self.state = self.elevator.get_state()
         self.steps_to_wait = 0
         self.step = 0
+        self.number_command = 0
 
     def get_next_action(self):
         action = ActionType.WAIT
@@ -29,13 +30,13 @@ class UnityServer:
             self.steps_to_wait = TimeWaitType.get_time_to_wait(action)
         self.steps_to_wait = max(0, self.steps_to_wait - 1)
 
-        while len(self.commands) > 0:
-            time, from_level, to_level, weight_passenger = self.commands[0]
+        while len(self.commands) > self.number_command:
+            time, from_level, to_level, weight_passenger = self.commands[self.number_command]
             if (self.step % Environment.STEPS) == int(time):
                 passenger = Passenger(from_level, to_level, weight_passenger)
-                self.elevator.add_call(from_level, False, passenger)
+                self.elevator.add_call(passenger, False)
                 self.state = self.elevator.get_state()
-                self.commands.pop(0)
+                self.number_command += 1
             else:
                 break
         self.step += 1

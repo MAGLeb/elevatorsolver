@@ -71,10 +71,11 @@ class LearningAgentDQL(nn.Module, Agent):
             architecture_str.append(layer_str)
 
         architecture = " -> ".join(architecture_str)
-        wandb.config.architecture = architecture
-        wandb.config.learning_rate = self.learning_rate
-        wandb.config.buffer_size = self.buffer_size
-        wandb.config.batch_size = self.batch_size
+        if wandb.run is not None:
+            wandb.config.architecture = architecture
+            wandb.config.learning_rate = self.learning_rate
+            wandb.config.buffer_size = self.buffer_size
+            wandb.config.batch_size = self.batch_size
 
     def load(self, filepath):
         checkpoint = torch.load(filepath)

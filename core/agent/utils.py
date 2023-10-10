@@ -5,6 +5,9 @@ from core.agent.q_table_agent.q_table_agent import LearningAgentQTable
 from core.agent.dql_agent.dql_agent import LearningAgentDQL
 from core.types.agent_type import AgentType
 from core.utils.environment import Environment
+from core.elevator import Elevator
+from core.passenger import Passenger
+from core.types.time_wait_type import TimeWaitType
 
 
 def initialize_agent():
@@ -26,3 +29,32 @@ def initialize_agent():
             f"PATH: {Environment.MODEL_FILE_PATH}")
 
     return agent
+
+
+def run_episode(agent, commands):
+    elevator = Elevator()
+    state = elevator.get_state()
+    total_reward = 0
+    steps_to_wait = 0
+    j = 0
+
+    for step in range(Environment.STEPS):
+        if steps_to_wait == 0:
+            action = agent.choose_action(state)
+            next_state, reward = elevator.step(action)
+            agent.learn(state, reward, action, next_state)
+            state = next_state
+            total_reward += reward
+            steps_to_wait = TimeWaitType.get_time_to_wait(action)
+        steps_to_wait = max(0, steps_to_wait - 1)
+
+        while len(commands) > j:
+            time, from_level, to_level, weight_passenger = commands[j]
+            if (step % Environment.STEPS) != int(time):
+                break
+            passenger = Passenger(from_level, to_level, weight_passenger)
+            elevator.add_call(passenger, False)
+            state = elevator.get_state()
+            j += 1
+
+    return total_reward

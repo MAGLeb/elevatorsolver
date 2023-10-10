@@ -36,27 +36,27 @@ class Elevator:
         reward -= sum(state[1]) * RewardType.PASSENGER_WAIT.value
         return state, reward
 
-    def get_passengers_into_elevator(self, level: Level):
+    def get_passengers_into_elevator(self):
         passengers = 0
+        level = self.levels[self.current_level]
         while level.passengers:
             if self.max_weight < self.weight + level.passengers[0].weight:
                 break
             p = level.passengers.pop(0)
             self.passengers.append(p)
             self.weight += p.weight
-            self.add_call(p.to_level, True, None)
+            self.add_call(p, True)
             passengers += 1
 
-        if level.is_empty():
-            level.type = [0, 0]
-        else:
-            level.type = [1, 0]
+        level.update_types()
         return passengers
 
-    def add_call(self, level, is_inside_call: bool, passenger: Optional[Passenger]):
-        if is_inside_call:
+    def add_call(self, passenger: Optional[Passenger], is_inside: bool):
+        if is_inside:
+            level = passenger.to_level
             self.levels[level].set_inside_elevator_call()
         else:
+            level = passenger.from_level
             self.levels[level].set_outside_elevator_call(passenger)
 
     def get_state(self):
@@ -108,8 +108,7 @@ class Elevator:
         self.passengers = [p for p in self.passengers if p.to_level != self.current_level]
 
         # 2. enter passengers
-        level = self.levels[self.current_level]
-        number_new_passengers = self.get_passengers_into_elevator(level)
+        number_new_passengers = self.get_passengers_into_elevator()
         reward += number_new_passengers * RewardType.GET_PASSENGER.value
 
         # 3. negative reward
