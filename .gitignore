@@ -64,6 +64,7 @@ Desktop.ini
 # === Logs ===
 *.log
 wandb
+config.yml
 
 # === Others ===
 # Add files that you want to exclude. For example:
