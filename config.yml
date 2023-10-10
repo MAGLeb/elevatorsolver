@@ -5,7 +5,7 @@ case_params:
   train_tests: 50
   validation_tests: 5
 experiment_params:
-  agent_type: DQL
+  agent_type: BASE
   elevator_weight: 680
   episodes: 15
-  experiment_name: a0CeDG3
+  experiment_name: null
