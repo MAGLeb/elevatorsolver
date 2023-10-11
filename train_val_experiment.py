@@ -23,7 +23,8 @@ print(f"Training settings:"
 
 wandb.init(project="ElevatorSolver", name=f"{Environment.AGENT_TYPE.value}_{Environment.EXPERIMENT_NAME}")
 wandb.config.episodes = Environment.NUM_EPISODES
-wandb.config.number_calls = Environment.LEVELS * Environment.PASSABILITY
+wandb.config.levels = Environment.LEVELS
+wandb.config.passability = Environment.PASSABILITY
 
 for i in range(Environment.NUMBER_TRAIN_PER_CASE):
     print(f"\nProcessing test {i + 1} out of {Environment.NUMBER_TRAIN_PER_CASE}...")

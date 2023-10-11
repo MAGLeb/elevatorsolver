@@ -12,7 +12,7 @@ from core.utils.utils import read_commands_from_file
 class UnityServer:
     def __init__(self):
         self.commands = read_commands_from_file(
-            os.path.join(Environment.VALIDATE_TESTS_PATH, 'validation_4.txt'))
+            os.path.join(Environment.VALIDATE_TESTS_PATH, 'validation_1.txt'))
         self.agent = initialize_agent()
         self.agent.exploration_rate = 0
         self.elevator = Elevator()
