@@ -8,6 +8,7 @@ from core.utils.environment import Environment
 from core.elevator import Elevator
 from core.passenger import Passenger
 from core.types.time_wait_type import TimeWaitType
+from core.types.reward_type import RewardType
 
 
 def initialize_agent():
@@ -37,15 +38,20 @@ def run_episode(agent, commands):
     total_reward = 0
     steps_to_wait = 0
     j = 0
+    reward = 0
 
     for step in range(Environment.STEPS):
+        reward -= (sum(state[0]) + sum(state[1])) * RewardType.PASSENGER_WAIT.value
+
         if steps_to_wait == 0:
             action = agent.choose_action(state)
-            next_state, reward = elevator.step(action)
+            next_state, step_reward = elevator.step(action)
+            reward += step_reward
             agent.learn(state, reward, action, next_state)
             state = next_state
             total_reward += reward
             steps_to_wait = TimeWaitType.get_time_to_wait(action)
+            reward = 0
         steps_to_wait = max(0, steps_to_wait - 1)
 
         while len(commands) > j:
