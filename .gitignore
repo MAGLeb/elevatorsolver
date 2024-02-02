@@ -2,6 +2,7 @@
 **/__pycache__/
 .env
 cases/
+local
 
 # .gitignore for Unity projects
 
