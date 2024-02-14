@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "elevator-solver"
+version = "0.1.0"
+description = ""
+authors = ["magleb <maximovglebigorevich@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+flask = "^3.0.1"
+numpy = "^1.26.3"
+scipy = "^1.12.0"
+pyyaml = "^6.0.1"
+torch = "^2.2.0"
+torchaudio = "^2.2.0"
+torchvision = "^0.17.0"
+wandb = "^0.16.2"
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
