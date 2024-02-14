@@ -1,7 +1,7 @@
 import os
 
 from core.agent.utils import initialize_agent
-from core.elevator import Elevator
+from core.manager import Manager
 from core.passenger import Passenger
 from core.types.time_wait_type import TimeWaitType
 from core.types.action_type import ActionType
@@ -11,12 +11,14 @@ from core.utils.utils import read_commands_from_file
 
 class UnityServer:
     def __init__(self):
-        self.commands = read_commands_from_file(
-            os.path.join(Environment.VALIDATE_TESTS_PATH, 'validation_1.txt'))
+        self.manager = Manager()
         self.agent = initialize_agent()
         self.agent.exploration_rate = 0
-        self.elevator = Elevator()
-        self.state = self.elevator.get_state()
+
+        self.commands = read_commands_from_file(
+            os.path.join(Environment.VALIDATE_TESTS_PATH, 'validation_1.txt'))
+
+        self.state = self.manager.get_state()
         self.steps_to_wait = 0
         self.step = 0
         self.number_command = 0

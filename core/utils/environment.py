@@ -40,25 +40,27 @@ class Environment:
 
     UNITY_SERVER_PORT = 5000
 
+    def __init__(self):
+        self._initialisation_environment()
+        self._initialize_folders()
+
     @classmethod
     def _initialisation_environment(cls):
         config_path = os.path.join(cls.PROJECT_PATH, "config.yml")
         with open(config_path, "r") as file:
             params = yaml.safe_load(file)
-            case_params = params['case_params']
             experiment_params = params['experiment_params']
 
-        # Initialisation params from case_params
-        cls.LEVELS = case_params.get('levels', 10)
-        cls.PASSABILITY = case_params.get('passability', 7200)
-        cls.ELEVATORS = case_params.get('elevators', 1)
-        cls.NUMBER_TRAIN_PER_CASE = case_params.get('train_tests', 1000 if cls.IS_PRODUCTION else 3)
-        cls.NUMBER_VALIDATION_PER_CASE = case_params.get('validation_tests', 10 if cls.IS_PRODUCTION else 1)
-
         # Initialisation params from experiment_params
+        cls.LEVELS = experiment_params.get('levels', 10)
+        cls.PASSABILITY = experiment_params.get('passability', 7200)
+        cls.ELEVATORS = experiment_params.get('elevators', 1)
+        cls.NUMBER_TRAIN_PER_CASE = experiment_params.get('train_tests', 1000 if cls.IS_PRODUCTION else 3)
+        cls.NUMBER_VALIDATION_PER_CASE = experiment_params.get('validation_tests', 10 if cls.IS_PRODUCTION else 1)
         cls.AGENT_TYPE = AgentType(experiment_params.get('agent_type', "DQL"))
         cls.NUM_EPISODES = experiment_params.get('episodes', 100 if cls.IS_PRODUCTION else 3)
-        cls.ELEVATOR_WEIGHT = experiment_params.get('elevator_weight', 680)
+        cls.ELEVATOR_WEIGHT = 680
+        # cls.ELEVATOR_WEIGHT = experiment_params.get('elevator_weight', 680)
 
         cls.EXPERIMENT_NAME = experiment_params.get('experiment_name')
         if cls.EXPERIMENT_NAME is None:
@@ -106,7 +108,3 @@ class Environment:
         cls.MODEL_FILE_PATH = os.path.join(experiment_path, "model.npy")
         cls.VALIDATE_RESULTS_FILE_PATH = os.path.join(results_path, "validation.txt")
         cls.TRAIN_RESULTS_FILE_PATH = os.path.join(results_path, "train.txt")
-
-
-Environment._initialisation_environment()
-Environment._initialize_folders()

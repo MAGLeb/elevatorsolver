@@ -3,6 +3,7 @@
 .env
 cases/
 local
+config.yml
 
 # .gitignore for Unity projects
 

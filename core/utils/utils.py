@@ -21,6 +21,6 @@ def read_commands_from_file(filename):
             commands.append([time, from_level, to_level, weight])
             n -= 1
 
-    print(f"Read {len(commands)} commands from test data.")
+    print(f"Read {len(commands)} commands.")
 
     return commands

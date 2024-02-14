@@ -1,11 +1,13 @@
-case_params:
-  elevators: 1
+experiment_params:
   levels: 4
   passability: 7200
   train_tests: 10
   validation_tests: 5
-experiment_params:
   agent_type: BASE
-  elevator_weight: 680
-  episodes: 1
+  episodes: 10
   experiment_name: null
+elevators:
+  1:
+    elevator_weight: 680
+  2:
+    elevator_weight: 680

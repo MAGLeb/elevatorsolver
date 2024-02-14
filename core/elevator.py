@@ -3,20 +3,21 @@ from typing import List
 from core.types.action_type import ActionType
 from core.types.reward_type import RewardType
 from core.level import Level
+from core.types.state_elevator import StateElevator
 
 
 class Elevator:
     def __init__(self, max_levels: int, max_weight: int):
         self.max_levels = max_levels
         self.max_weight = max_weight
+
         self.passengers = []
         self.going_to_level = [0 for _ in range(max_levels)]
-
         self.current_weight = 0
         self.current_level = 0
         self.is_door_open = False
 
-    def step(self, action: ActionType, levels: List[Level]):
+    def step(self, action: ActionType, levels: List[Level]) -> int:
         if action == ActionType.UP:
             reward = self._up()
         elif action == ActionType.DOWN:
@@ -29,9 +30,8 @@ class Elevator:
             reward = 0
         else:
             raise ValueError("Only 5 types of action.")
-        state = self.get_state()
 
-        return state, reward
+        return reward
 
     def _get_passengers_into_elevator(self, levels: List[Level]) -> int:
         passengers = 0
@@ -59,13 +59,10 @@ class Elevator:
 
         return reward
 
-    def get_state(self):
-        is_opened = 1 if self.is_door_open else 0
-        return self.going_to_level, self.current_level, self._weight_converter(), is_opened
-
-    def _weight_converter(self):
-        # Map from wide space to [0, 1] range output. It is help NN learn better.
-        return self.current_weight / self.max_weight
+    def get_state(self) -> StateElevator:
+        state = StateElevator(self.going_to_level, self.current_level,
+                              self.current_weight, self.max_weight, self.is_door_open)
+        return state
 
     def _up(self):
         reward = RewardType.UP_DOWN_STEP.value
