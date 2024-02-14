@@ -19,7 +19,3 @@ class Manager:
             reward += elevator.step(action, self.levels)
 
         return reward
-
-    def is_no_calls_outside(self) -> bool:
-        empty_levels = [level for level in self.levels if level.is_empty()]
-        return len(empty_levels) == 0
