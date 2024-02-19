@@ -38,8 +38,12 @@ class LearningAgentDQL(nn.Module, Agent):
         self.buffer = ReplayBuffer(buffer_size)
         self.batch_size = batch_size
 
-        self.fc1 = nn.Linear(self.levels * 2 + 3, 512)
-        self.fc2 = nn.Linear(512, 5)
+        # outside_levels, inside_levels for each elevator
+        # current_level, current_weight, door_state, max_weight for each elevator
+        # max_weight among elevators
+        self.fc1 = nn.Linear(self.levels + self.levels * self.elevators + 4 * self.elevators + 1, 1024)
+        self.fc2 = nn.Linear(1024, 256)
+        self.fc3 = nn.Linear(256, 5)
 
         self.relu = nn.LeakyReLU()
         self.loss_function = nn.MSELoss()
@@ -52,6 +56,8 @@ class LearningAgentDQL(nn.Module, Agent):
         self.log_model_params()
 
     def log_model_params(self):
+        # TODO rewrite.
+        # Method should return architecture of model without writing to WanDB.
         architecture_str = []
 
         for layer in self.children():
@@ -133,4 +139,5 @@ class LearningAgentDQL(nn.Module, Agent):
 
     def forward(self, x):
         x = self.relu(self.fc1(x))
-        return self.fc2(x)
+        x = self.relu(self.fc2(x))
+        return self.fc3(x)
