@@ -13,13 +13,13 @@ def seconds_format(random_value):
     return int(random_value * 86400 / 24)
 
 
-def generate_time_call(n):
+def generate_time_call(n, day):
     calls = []
     uniform_random_values = np.random.uniform(0, 1, n)
     for u in uniform_random_values:
         custom_random_value = calculator.inverse_cdf(u)
         seconds = seconds_format(custom_random_value)
-        calls.append(seconds)
+        calls.append(seconds + 86400 * day)
 
     calls.sort()
     return calls
@@ -45,7 +45,7 @@ def choose_level(tb, bt, p, tb_i, bt_i):
     return level_pair, tb_i, bt_i
 
 
-def generate_levels(n, times):
+def generate_levels(n, times, day):
     times_half = int(n / 2)
     levels = [random.randint(2, Environment.LEVELS) for _ in range(times_half)]
     tb = [[level - 1, 0] for level in levels]
@@ -58,11 +58,11 @@ def generate_levels(n, times):
     bottom_top_index = 0
 
     for i in range(n):
-        if times[i] < 18000:
+        if times[i] < 18000 * day:
             probability = 0.2
-        elif times[i] < 36000:
+        elif times[i] < 36000 * day:
             probability = 0.9
-        elif times[i] < 57600:
+        elif times[i] < 57600 * day:
             probability = 0.5
         else:
             probability = 0.2
@@ -73,17 +73,19 @@ def generate_levels(n, times):
 
 
 def generate_test_sample(filename):
-    n = int(Environment.LEVELS * Environment.PASSABILITY)
+    n = Environment.PASSABILITY
     if n % 2 == 1:
         n += 1
-    times = generate_time_call(n)
-    level_pairs = generate_levels(n, times)
 
     with open(filename, 'w') as f:
         f.write(f"{n}\n")
-        for i in range(n):
-            weight_of_passenger = generate_weight_passenger()
-            f.write(f"{times[i]} {level_pairs[i][0]} {level_pairs[i][1]} {weight_of_passenger}\n")
+        for day in range(Environment.DAYS):
+            times = generate_time_call(n, day)
+            level_pairs = generate_levels(n, times, day)
+
+            for i in range(n):
+                weight_of_passenger = generate_weight_passenger()
+                f.write(f"{times[i]} {level_pairs[i][0]} {level_pairs[i][1]} {weight_of_passenger}\n")
 
 
 def generate_tests(path, filename, number_tests):
