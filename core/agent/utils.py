@@ -35,7 +35,7 @@ def initialize_agent(agent_type: AgentType, model_path: str = None):
     return agent
 
 
-def run_episode(commands, agent, levels, elevators_weight):
+def run_episode(commands, agent, levels, elevators_weight, is_validate_run):
     manager = Manager(levels, elevators_weight)
     state = manager.get_state()
     total_reward = 0
@@ -54,7 +54,8 @@ def run_episode(commands, agent, levels, elevators_weight):
         action = agent.choose_action(state)
         next_state, step_reward = manager.step(action)
         reward = [sum(x) for x in zip(step_reward, reward)]
-        agent.learn(state, reward, action, next_state)
+        if not is_validate_run:
+            agent.learn(state, reward, action, next_state)
         state = next_state
         total_reward += sum(reward)
         reward = [0 for _ in range(Environment.ELEVATORS)]
@@ -76,7 +77,7 @@ def validate_agent(agent: Agent, levels: int, elevators_weight: List):
     for j in range(Environment.NUMBER_VALIDATION_PER_CASE):
         filename = f"{Environment.VALIDATE_TESTS_PATH}/validation_{j + 1}.txt"
         val_commands = read_commands_from_file(filename)
-        val_reward = run_episode(val_commands, agent, levels, elevators_weight)
+        val_reward = run_episode(val_commands, agent, levels, elevators_weight, True)
         val_rewards.append(val_reward)
 
     return val_rewards
@@ -87,7 +88,7 @@ def train_agent(commands: List[str], agent: Agent, levels: int, elevators_weight
     total_val_rewards = []
 
     for episode in range(Environment.NUM_EPISODES):
-        reward = run_episode(commands, agent, levels, elevators_weight)
+        reward = run_episode(commands, agent, levels, elevators_weight, False)
         total_rewards.append(reward)
         log({'train_episode_reward': reward})
         print(f"Episode {episode + 1}: \nTotal Reward: {reward}")
