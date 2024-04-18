@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 
-from core.unity.unity_server import UnityServer
+from unity.unity_server import UnityServer
 from core.utils.environment import Environment
 
 app = Flask(__name__)

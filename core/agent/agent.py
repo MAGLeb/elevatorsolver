@@ -9,6 +9,7 @@ class Agent(ABC):
     @abstractmethod
     def __init__(self):
         self.levels = Environment.LEVELS
+        self.elevators = Environment.ELEVATORS
         self.exploration_fall = self.calculate_exploration_fall()
 
     @abstractmethod

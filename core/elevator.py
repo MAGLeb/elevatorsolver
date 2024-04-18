@@ -1,24 +1,31 @@
-from typing import Optional
+from typing import List
 
-from core.level import Level
 from core.types.action_type import ActionType
 from core.types.reward_type import RewardType
-from core.passenger import Passenger
-from core.utils.environment import Environment
+from core.level import Level
+
+
+class StateElevator:
+    def __init__(self, going_to_level: List[int], current_level: int, current_weight: int, max_weight: int, is_open_door: int):
+        self.going_to_level = going_to_level
+        self.current_level = current_level
+        self.current_weight = current_weight
+        self.max_weight = max_weight
+        self.is_open_door = is_open_door
 
 
 class Elevator:
-    def __init__(self):
-        self.max_levels = Environment.LEVELS
-        self.max_weight = Environment.ELEVATOR_WEIGHT
-        self.levels = [Level(i) for i in range(self.max_levels)]
-        self.passengers = []
+    def __init__(self, max_levels: int, max_weight: int):
+        self.max_levels = max_levels
+        self.max_weight = max_weight
 
-        self.weight = 0
+        self.passengers = []
+        self.going_to_level = [0 for _ in range(max_levels)]
+        self.current_weight = 0
         self.current_level = 0
         self.is_door_open = False
 
-    def step(self, action: ActionType):
+    def step(self, action: ActionType, levels: List[Level]) -> int:
         if action == ActionType.UP:
             reward = self._up()
         elif action == ActionType.DOWN:
@@ -26,50 +33,48 @@ class Elevator:
         elif action == ActionType.CLOSE_DOOR:
             reward = self._close()
         elif action == ActionType.OPEN_DOOR:
-            reward = self._open()
+            reward = self._open(levels)
         elif action == ActionType.WAIT:
-            reward = self._wait()
+            reward = 0
         else:
             raise ValueError("Only 5 types of action.")
-        state = self.get_state()
-        reward -= sum(state[0]) * RewardType.PASSENGER_WAIT.value
-        reward -= sum(state[1]) * RewardType.PASSENGER_WAIT.value
-        return state, reward
 
-    def get_passengers_into_elevator(self):
+        return reward
+
+    def _get_passengers_into_elevator(self, levels: List[Level]) -> int:
         passengers = 0
-        level = self.levels[self.current_level]
-        while level.passengers:
-            if self.max_weight < self.weight + level.passengers[0].weight:
+        level = levels[self.current_level]
+
+        while level.get_passenger() is not None:
+            if self.max_weight < self.current_weight + level.get_passenger().weight:
                 break
-            p = level.passengers.pop(0)
-            self.passengers.append(p)
-            self.weight += p.weight
-            self.add_call(p, True)
+            passenger = level.pop_passenger()
+            self.current_weight += passenger.weight
+            number_level = passenger.to_level
+            self.going_to_level[number_level] = 1
             passengers += 1
 
-        level.update_types()
-        return passengers
+        return passengers * RewardType.GET_PASSENGER.value
 
-    def add_call(self, passenger: Optional[Passenger], is_inside: bool):
-        if is_inside:
-            level = passenger.to_level
-            self.levels[level].set_inside_elevator_call()
-        else:
-            level = passenger.from_level
-            self.levels[level].set_outside_elevator_call(passenger)
+    def _get_out_passengers_from_elevator(self) -> int:
+        reward = 0
 
-    def get_state(self):
-        outside_calls = [level.type[0] for level in self.levels]
-        inside_calls = [level.type[1] for level in self.levels]
-        is_opened = 1 if self.is_door_open else 0
-        return outside_calls, inside_calls, self.current_level, self.get_weight_state(), is_opened
+        for p in self.passengers:
+            if p.to_level == self.current_level:
+                self.current_weight -= p.weight
+                reward += RewardType.DELIVER_PASSENGER.value
+        self.passengers = [p for p in self.passengers if p.to_level != self.current_level]
 
-    def get_weight_state(self):
-        return min(7, int((self.weight * 8 / self.max_weight)))
+        return reward
+
+    def get_state(self) -> StateElevator:
+        state = StateElevator(self.going_to_level, self.current_level,
+                              self.current_weight, self.max_weight, self.is_door_open)
+        return state
 
     def _up(self):
-        reward = 0
+        reward = RewardType.UP_DOWN_STEP.value
+
         if self.is_door_open:
             reward -= RewardType.MOVE_WITH_OPEN_DOOR.value
 
@@ -80,7 +85,8 @@ class Elevator:
         return reward
 
     def _down(self):
-        reward = 0
+        reward = RewardType.UP_DOWN_STEP.value
+
         if self.is_door_open:
             reward -= RewardType.MOVE_WITH_OPEN_DOOR.value
 
@@ -91,38 +97,18 @@ class Elevator:
         return reward
 
     def _close(self):
-        reward = 0
-        if self.is_door_open:
-            reward += RewardType.CLOSE_DOOR.value
+        reward = RewardType.OPEN_CLOSE_DOOR.value
         self.is_door_open = False
         return reward
 
-    def _open(self):
-        reward = 0
-
-        # 1. left passengers
-        for p in self.passengers:
-            if p.to_level == self.current_level:
-                self.weight -= p.weight
-                reward += RewardType.DELIVER_PASSENGER.value
-        self.passengers = [p for p in self.passengers if p.to_level != self.current_level]
-
-        # 2. enter passengers
-        number_new_passengers = self.get_passengers_into_elevator()
-        reward += number_new_passengers * RewardType.GET_PASSENGER.value
-
-        # 3. negative reward
-        if reward == 0:
-            reward -= RewardType.OPEN_ON_EMPTY_LEVEL.value
+    def _open(self, levels: List[Level]):
+        self.going_to_level[self.current_level] = 0
         self.is_door_open = True
 
-        return reward
+        reward = RewardType.OPEN_CLOSE_DOOR.value
+        # 1. get out passengers from elevator
+        reward += self._get_out_passengers_from_elevator()
+        # 2. enter passengers to elevator
+        reward += self._get_passengers_into_elevator(levels)
 
-    def _wait(self):
-        reward = 0
-        empty_levels = [level for level in self.levels if level.is_empty()]
-        if len(empty_levels) == self.max_levels:
-            reward += RewardType.WAIT_WHEN_NO_CALLS.value
-        else:
-            reward -= RewardType.WAIT_WHEN_CALLS.value
         return reward

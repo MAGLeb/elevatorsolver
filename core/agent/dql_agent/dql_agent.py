@@ -1,5 +1,6 @@
 import random
 from collections import namedtuple, deque
+from typing import List
 
 import wandb
 import torch
@@ -8,6 +9,7 @@ import torch.optim as optim
 
 from core.agent.agent import Agent
 from core.types.action_type import ActionType
+from core.utils.environment import Environment
 
 Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 
@@ -38,8 +40,11 @@ class LearningAgentDQL(nn.Module, Agent):
         self.buffer = ReplayBuffer(buffer_size)
         self.batch_size = batch_size
 
-        self.fc1 = nn.Linear(self.levels * 2 + 3, 512)
-        self.fc2 = nn.Linear(512, 5)
+        # outside_levels, inside_levels for each elevator
+        # current_level, current_weight, door_state, max_weight for each elevator
+        self.fc1 = nn.Linear(self.levels + self.levels * self.elevators + 4 * self.elevators, 1024)
+        self.fc2 = nn.Linear(1024, 256)
+        self.fc3 = nn.Linear(256, len(ActionType) * self.elevators)
 
         self.relu = nn.LeakyReLU()
         self.loss_function = nn.MSELoss()
@@ -52,6 +57,8 @@ class LearningAgentDQL(nn.Module, Agent):
         self.log_model_params()
 
     def log_model_params(self):
+        # TODO rewrite.
+        # Method should return architecture of model without writing to WanDB.
         architecture_str = []
 
         for layer in self.children():
@@ -88,16 +95,27 @@ class LearningAgentDQL(nn.Module, Agent):
             'optimizer_state_dict': self.optimizer.state_dict(),
         }, filepath)
 
-    def choose_action(self, state) -> ActionType:
+    def choose_action(self, state) -> List[ActionType]:
+        actions = []
+
         self.exploration_rate *= self.exploration_fall
         random_action = random.random()
         if random_action < self.exploration_rate:
-            return random.choice(list(ActionType))
+            for i in range(self.elevators):
+                actions.append(random.choice(list(ActionType)))
+            return actions
 
         state = self._convert_elevator_state_to_tensor(state)
         output = self.forward(state)
-        best_action = torch.argmax(output).item()
-        return ActionType(best_action)
+        for i in range(self.elevators):
+            start = i * len(ActionType)
+            end = (i + 1) * len(ActionType)
+            elevator_actions = output[:, start:end]
+
+            best_actions = torch.argmax(elevator_actions).item()
+            actions.append(ActionType(best_actions))
+
+        return actions
 
     def learn(self, state, reward, action, next_state):
         self.buffer.push(state, action, next_state, reward)
@@ -109,28 +127,48 @@ class LearningAgentDQL(nn.Module, Agent):
         batch = Transition(*zip(*transitions))
 
         state_batch = torch.cat([self._convert_elevator_state_to_tensor(s) for s in batch.state])
-        action_values = [a.value for a in batch.action]
-        action_batch = torch.tensor(action_values, dtype=torch.int64).view(-1, 1)
-        reward_batch = torch.tensor(batch.reward, dtype=torch.float32).view(-1, 1)
+        action_values = []
+        for actions in batch.action:
+            action_values.append([actions[i].value + len(ActionType) * i for i in range(Environment.ELEVATORS)])
+        action_batch = torch.tensor(action_values, dtype=torch.int64)
+        reward_batch = torch.tensor(batch.reward, dtype=torch.float32)
         next_state_batch = torch.cat([self._convert_elevator_state_to_tensor(s) for s in batch.next_state])
 
         q_predicted = self.forward(state_batch)
         q_predicted_actions = q_predicted.gather(1, action_batch).squeeze()
 
         q_next = self.forward(next_state_batch).detach()
-        q_target = reward_batch + self.gamma * q_next.max(1)[0].unsqueeze(1)
+        q_target = reward_batch + self.gamma * self._process_q_values(q_next)
 
         loss = self.loss_function(q_predicted_actions, q_target.squeeze())
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
 
+    def forward(self, x):
+        x = self.relu(self.fc1(x))
+        x = self.relu(self.fc2(x))
+        return self.fc3(x)
+
+    @staticmethod
+    def _process_q_values(q_next):
+        max_q_values = []
+        num_elevators = Environment.ELEVATORS
+        actions_per_elevator = len(ActionType)
+
+        for i in range(num_elevators):
+            start_index = i * actions_per_elevator
+            end_index = start_index + actions_per_elevator
+            q_next_elevator = q_next[:, start_index:end_index]
+            max_q_next_elevator = q_next_elevator.max(1)[0]
+            max_q_values.append(max_q_next_elevator)
+
+        max_q_next_combined = torch.stack(max_q_values, dim=1)
+
+        return max_q_next_combined
+
     def _convert_elevator_state_to_tensor(self, state):
         state = [item for sublist in state for item in (sublist if isinstance(sublist, list) else [sublist])]
         state = torch.tensor(state, dtype=torch.float32).to(self.device)
         state = state.unsqueeze(0)
         return state
-
-    def forward(self, x):
-        x = self.relu(self.fc1(x))
-        return self.fc2(x)
