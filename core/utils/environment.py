@@ -3,6 +3,7 @@ import yaml
 import random
 import string
 import shutil
+import hashlib
 
 from dotenv import load_dotenv
 
@@ -14,6 +15,8 @@ load_dotenv()
 class Environment:
     PROJECT_PATH = os.environ.get('PROJECT_PATH')
     IS_PRODUCTION = os.environ.get('IS_PRODUCTION', 'False') == 'True'
+    WANDB_KEY = os.environ.get('WANDB_KEY', None)
+    WANDB_LOGIN = False
 
     # CASE params
     NUMBER_TRAIN_PER_CASE = None
@@ -40,7 +43,7 @@ class Environment:
 
     # Each step is a second on the daytime. We set 90000 more than seconds
     # on the day, to give extra time for Elevator to process all the passengers.
-    STEPS = 90000
+    STEPS = None
 
     def __init__(self):
         self._initialisation_environment()
@@ -57,28 +60,45 @@ class Environment:
         # Initialisation params from Case
         cls.LEVELS = data_params.get('levels', 10)
         cls.PASSABILITY = data_params.get('passability', 7200)
-        cls.ELEVATORS = data_params.get('elevators', 1)
         cls.NUMBER_TRAIN_PER_CASE = data_params.get('train_tests', 1000 if cls.IS_PRODUCTION else 3)
         cls.NUMBER_VALIDATION_PER_CASE = data_params.get('validation_tests', 10 if cls.IS_PRODUCTION else 1)
         cls.DAYS = data_params.get('days', 7 if cls.IS_PRODUCTION else 1)
+        cls.STEPS = 87000 * cls.DAYS
 
         # Initialisation params from Experiment
+        cls.ELEVATORS = case_params.get('elevators', 1)
         cls.AGENT_TYPE = AgentType(case_params.get('agent_type', "DQL"))
         cls.NUM_EPISODES = case_params.get('episodes', 20 if cls.IS_PRODUCTION else 3)
-        cls.ELEVATOR_WEIGHT = case_params.get('elevator_weight', [680 for _ in range(cls.ELEVATORS)])
+        cls.ELEVATORS_WEIGHT = case_params.get('elevator_weight', [680 for _ in range(cls.ELEVATORS)])
         cls.CASE_NAME = case_params.get('case_name')
         if cls.CASE_NAME is None:
             cls.CASE_NAME = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(7))
 
     @classmethod
-    def _update_case_name_in_copied_config(cls, copied_config_path):
-        with open(copied_config_path, 'r') as file:
+    def _create_case_config(cls, path):
+        shutil.copy(os.path.join(cls.PROJECT_PATH, "config.yml"), path)
+        config_path = os.path.join(path, "config.yml")
+        with open(config_path, 'r') as file:
             config_data = yaml.safe_load(file)
 
         config_data['case_params']['case_name'] = cls.CASE_NAME
 
-        with open(copied_config_path, 'w') as file:
+        with open(config_path, 'w') as file:
             yaml.safe_dump(config_data, file)
+
+    @classmethod
+    def _create_data_config(cls, path):
+        config_path = os.path.join(path, "config.yml")
+        if not os.path.exists(config_path):
+            shutil.copy(os.path.join(cls.PROJECT_PATH, "config.yml"), path)
+            config_path = os.path.join(path, "config.yml")
+            with open(config_path, 'r') as file:
+                config_data = yaml.safe_load(file)
+
+            del config_data['case_params']
+
+            with open(config_path, 'w') as file:
+                yaml.safe_dump(config_data, file)
 
     @classmethod
     def _initialize_folders(cls):
@@ -86,8 +106,12 @@ class Environment:
         data_path = os.path.join(experiments_path, "data")
         os.makedirs(data_path, exist_ok=True)
 
-        data_path = os.path.join(data_path, f"level_{cls.LEVELS}_elevators_{cls.ELEVATORS}")
+        data_folder_name = hashlib.sha256(
+            f"{cls.LEVELS} {cls.DAYS} {cls.PASSABILITY}"
+            f" {cls.NUMBER_TRAIN_PER_CASE} {cls.NUMBER_VALIDATION_PER_CASE}".encode()).hexdigest()[:8]
+        data_path = os.path.join(data_path, data_folder_name)
         os.makedirs(data_path, exist_ok=True)
+        cls._create_data_config(data_path)
 
         cls.VALIDATE_TESTS_PATH = os.path.join(data_path, "validation")
         os.makedirs(cls.VALIDATE_TESTS_PATH, exist_ok=True)
@@ -100,9 +124,7 @@ class Environment:
 
         cases_path = os.path.join(cases_path, f"{cls.AGENT_TYPE.value}_{cls.CASE_NAME}")
         os.makedirs(cases_path, exist_ok=True)
-
-        shutil.copy(os.path.join(cls.PROJECT_PATH, "config.yml"), cases_path)
-        cls._update_case_name_in_copied_config(os.path.join(cases_path, "config.yml"))
+        cls._create_case_config(cases_path)
 
         results_path = os.path.join(cases_path, "results")
         os.makedirs(results_path, exist_ok=True)
