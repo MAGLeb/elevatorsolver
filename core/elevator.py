@@ -76,10 +76,10 @@ class Elevator:
         reward = RewardType.UP_DOWN_STEP.value
 
         if self.is_door_open:
-            reward -= RewardType.MOVE_WITH_OPEN_DOOR.value
+            reward += RewardType.MOVE_WITH_OPEN_DOOR.value
 
         if self.current_level == self.max_levels - 1:
-            reward -= RewardType.MOVE_NEXT_TO_EDGE.value
+            reward += RewardType.MOVE_NEXT_TO_EDGE.value
         else:
             self.current_level += 1
         return reward
@@ -88,10 +88,10 @@ class Elevator:
         reward = RewardType.UP_DOWN_STEP.value
 
         if self.is_door_open:
-            reward -= RewardType.MOVE_WITH_OPEN_DOOR.value
+            reward += RewardType.MOVE_WITH_OPEN_DOOR.value
 
         if self.current_level == 0:
-            reward -= RewardType.MOVE_NEXT_TO_EDGE.value
+            reward += RewardType.MOVE_NEXT_TO_EDGE.value
         else:
             self.current_level -= 1
         return reward

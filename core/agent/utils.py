@@ -61,7 +61,7 @@ def run_episode(commands, agent, levels, elevators_weight, episode_info: Episode
         next_state, step_reward = manager.step(action)
         reward = [sum(x) for x in zip(step_reward, reward)]
         if not episode_info.is_validate_run:
-            if step % 100:
+            if step % 100 == 0:
                 log({f"train_episode_{episode_info.episode_number}_reward": sum(reward)})
             agent.learn(state, reward, action, next_state)
         state = next_state
