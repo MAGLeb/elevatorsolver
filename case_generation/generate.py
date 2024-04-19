@@ -78,7 +78,7 @@ def generate_test_sample(filename):
         n += 1
 
     with open(filename, 'w') as f:
-        f.write(f"{n}\n")
+        f.write(f"{n * Environment.DAYS}\n")
         for day in range(Environment.DAYS):
             times = generate_time_call(n, day)
             level_pairs = generate_levels(n, times, day)
