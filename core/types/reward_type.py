@@ -10,3 +10,7 @@ class RewardType(Enum):
     PASSENGER_WAIT = -0.05
     MOVE_NEXT_TO_EDGE = -1
     MOVE_WITH_OPEN_DOOR = -1
+
+    @classmethod
+    def to_string(cls):
+        return "; ".join(f"{name.replace('_', ' ')}: {value.value}" for name, value in cls.__members__.items())

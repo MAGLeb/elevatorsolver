@@ -10,7 +10,7 @@ calculator = DistributionCalculator()
 
 
 def seconds_format(random_value):
-    return int(random_value * 86400 / 24)
+    return int(random_value * Environment.SECONDS_IN_DAY / 24)
 
 
 def generate_time_call(n, day):
@@ -19,7 +19,7 @@ def generate_time_call(n, day):
     for u in uniform_random_values:
         custom_random_value = calculator.inverse_cdf(u)
         seconds = seconds_format(custom_random_value)
-        calls.append(seconds + 86400 * day)
+        calls.append(seconds + Environment.SECONDS_IN_DAY * day)
 
     calls.sort()
     return calls

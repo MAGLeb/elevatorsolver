@@ -43,6 +43,7 @@ class Environment:
 
     # Each step is a second on the daytime. We set 90000 more than seconds
     # on the day, to give extra time for Elevator to process all the passengers.
+    SECONDS_IN_DAY = 86400
     STEPS = None
 
     def __init__(self):
@@ -63,7 +64,7 @@ class Environment:
         cls.NUMBER_TRAIN_PER_CASE = data_params.get('train_tests', 1000 if cls.IS_PRODUCTION else 3)
         cls.NUMBER_VALIDATION_PER_CASE = data_params.get('validation_tests', 10 if cls.IS_PRODUCTION else 1)
         cls.DAYS = data_params.get('days', 7 if cls.IS_PRODUCTION else 1)
-        cls.STEPS = 87000 * cls.DAYS
+        cls.STEPS = cls.SECONDS_IN_DAY * cls.DAYS
 
         # Initialisation params from Experiment
         cls.ELEVATORS = case_params.get('elevators', 1)

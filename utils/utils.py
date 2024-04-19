@@ -1,10 +1,11 @@
 import wandb
 
 from core.utils.environment import Environment
+from core.types.reward_type import RewardType
 
 
 def initialise_settings_wandb():
-    if Environment.WANDB_KEY is not None and wandb.login(key="457fdbdea5069b232a4d4ef6a50dfb036f734a70"):
+    if Environment.WANDB_KEY is not None and wandb.login(key=Environment.WANDB_KEY):
         Environment.WANDB_LOGIN = True
         print(f"Training settings:"
               f" LEVELS = {Environment.LEVELS},"
@@ -21,6 +22,7 @@ def initialise_settings_wandb():
         wandb.config.elevators = Environment.ELEVATORS
         wandb.config.elevators_weight = Environment.ELEVATORS_WEIGHT
         wandb.config.agent_type = Environment.AGENT_TYPE.value
+        wandb.config.reward_type = RewardType.to_string()
     else:
         print("Put WanDB key into .env: WANDB_KEY='your_key_here'")
 
