@@ -13,6 +13,23 @@ class StateElevator:
         self.max_weight = max_weight
         self.is_open_door = is_open_door
 
+    def __eq__(self, other):
+        if not isinstance(other, StateElevator):
+            return NotImplemented
+        return (self.going_to_level == other.going_to_level and
+                self.current_level == other.current_level and
+                self.current_weight == other.current_weight and
+                self.max_weight == other.max_weight and
+                self.is_open_door == other.is_open_door)
+
+    def __str__(self):
+        return (f"Elevator State:\n"
+                f"  Current Level: {self.current_level}\n"
+                f"  Going to Levels: {self.going_to_level}\n"
+                f"  Current Weight: {self.current_weight} kg\n"
+                f"  Maximum Weight: {self.max_weight} kg\n"
+                f"  Door Open: {'Yes' if self.is_open_door else 'No'}")
+
 
 class Elevator:
     def __init__(self, max_levels: int, max_weight: int):
@@ -50,9 +67,9 @@ class Elevator:
                 break
             passenger = level.pop_passenger()
             self.current_weight += passenger.weight
-            number_level = passenger.to_level
-            self.going_to_level[number_level] = 1
+            self.going_to_level[passenger.to_level] = 1
             passengers += 1
+            self.passengers.append(passenger)
 
         return passengers * RewardType.GET_PASSENGER.value
 
