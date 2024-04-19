@@ -54,7 +54,7 @@ def run_episode(commands, agent, levels, elevators_weight, episode_info: Episode
         for i in range(Environment.ELEVATORS):
             elevator_state = manager_state.elevator_states[i]
             number_passengers_wait_inside = sum(elevator_state.going_to_level)
-            reward[i] -= ((number_passengers_wait_outside + number_passengers_wait_inside)
+            reward[i] += ((number_passengers_wait_outside + number_passengers_wait_inside)
                           * RewardType.PASSENGER_WAIT.value)
 
         action = agent.choose_action(state)
