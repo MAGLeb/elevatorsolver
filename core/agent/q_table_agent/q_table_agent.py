@@ -6,6 +6,17 @@ from core.agent.agent import Agent
 from core.types.action_type import ActionType
 
 
+# LEGACY CODE WARNING:
+# This class, LearningAgentQTable, was originally designed to handle a single elevator only.
+# It is not currently integrated into the broader elevator management system. This means:
+# - It cannot directly manage or interact with multiple elevators.
+# - It lacks interfaces to communicate with other parts of a more complex system.
+# TODO:
+# - Refactor the class to support multi-elevator scenarios.
+# - Integrate the class into the central management system.
+# - Ensure the class can handle dynamic interactions typical in a multi-elevator environment.
+# - Consider redesigning the class to utilize modern Python features
+#   and libraries for better performance and scalability.
 class LearningAgentQTable(Agent):
     def __init__(self, learning_rate=0.1, discount_rate=0.9, exploration_rate=1):
         Agent.__init__(self)

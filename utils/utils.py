@@ -14,7 +14,14 @@ def initialise_settings_wandb():
               f" CASE NAME = {Environment.CASE_NAME},"
               f" AGENT TYPE = {Environment.AGENT_TYPE.value}.")
 
-        wandb.init(project="ElevatorSolver", name=f"{Environment.AGENT_TYPE.value}_{Environment.CASE_NAME}")
+        tags = []
+        if not Environment.IS_PRODUCTION:
+            tags += ['local']
+        else:
+            tags += ['production']
+        wandb.init(project="ElevatorSolver",
+                   name=f"{Environment.AGENT_TYPE.value}_{Environment.CASE_NAME}",
+                   tags=tags)
         wandb.config.episodes = Environment.NUM_EPISODES
         wandb.config.levels = Environment.LEVELS
         wandb.config.passability = Environment.PASSABILITY
@@ -25,10 +32,3 @@ def initialise_settings_wandb():
         wandb.config.reward_type = RewardType.to_string()
     else:
         print("Put WanDB key into .env: WANDB_KEY='your_key_here'")
-
-
-def log(message):
-    if Environment.WANDB_LOGIN:
-        wandb.log(message)
-    else:
-        print(message)

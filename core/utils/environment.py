@@ -41,9 +41,9 @@ class Environment:
 
     UNITY_SERVER_PORT = 5000
 
-    # Each step is a second on the daytime. We set 90000 more than seconds
+    # Each step is a second on the daytime. We set 86400 more than seconds
     # on the day, to give extra time for Elevator to process all the passengers.
-    SECONDS_IN_DAY = 86400
+    SECONDS_IN_DAY = 86400 if IS_PRODUCTION else 100
     STEPS = None
 
     def __init__(self):

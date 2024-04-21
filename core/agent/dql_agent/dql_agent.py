@@ -117,7 +117,7 @@ class LearningAgentDQL(nn.Module, Agent):
 
         return actions
 
-    def learn(self, state, reward, action, next_state):
+    def learn(self, state, reward, action, next_state, case_info):
         self.buffer.push(state, action, next_state, reward)
 
         if len(self.buffer) < self.batch_size:
@@ -144,6 +144,15 @@ class LearningAgentDQL(nn.Module, Agent):
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
+
+        if case_info.step % 1000 == 0:
+            wandb.log({
+                'case_test_number': case_info.case,
+                'episode': case_info.episode,
+                'step': case_info.step,
+                'loss': loss.item(),
+                'reward': reward_batch.mean().item(),
+            })
 
     def forward(self, x):
         x = self.relu(self.fc1(x))
