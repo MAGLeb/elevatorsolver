@@ -18,4 +18,6 @@ class Level:
 
     def pop_passenger(self):
         passenger = self.passengers.pop(0)
+        if len(self.passengers) == 0:
+            self.outside_call = 0
         return passenger

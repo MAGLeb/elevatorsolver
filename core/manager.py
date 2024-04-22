@@ -57,7 +57,7 @@ class Manager:
         scaled_state = []
         scaled_state += list(map(float, state.going_to_level))
         scaled_state.append(state.current_level / self.max_level)
-        scaled_state.append(state.current_weight / self.max_elevators_weight)
+        scaled_state.append(state.current_weight / state.max_weight)
         scaled_state.append(state.max_weight / self.max_elevators_weight)
         scaled_state.append(float(state.is_open_door))
 
