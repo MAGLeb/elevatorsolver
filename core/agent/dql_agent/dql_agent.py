@@ -29,7 +29,7 @@ class ReplayBuffer:
 
 
 class LearningAgentDQL(nn.Module, Agent):
-    def __init__(self, learning_rate=0.0001, exploration_rate=1, buffer_size=45000, batch_size=64):
+    def __init__(self, learning_rate=0.0001, exploration_rate=1, buffer_size=4500, batch_size=64):
         nn.Module.__init__(self)
         Agent.__init__(self)
 
@@ -120,7 +120,7 @@ class LearningAgentDQL(nn.Module, Agent):
     def learn(self, state, reward, action, next_state, case_info):
         self.buffer.push(state, action, next_state, reward)
 
-        if len(self.buffer) < self.batch_size:
+        if len(self.buffer) < self.buffer_size:
             return
 
         transitions = self.buffer.sample(self.batch_size)
