@@ -3,6 +3,7 @@ from typing import List
 from core.types.action_type import ActionType
 from core.types.reward_type import RewardType
 from core.level import Level
+from core.utils.environment import Environment
 
 
 class StateElevator:
@@ -12,6 +13,11 @@ class StateElevator:
         self.current_weight = current_weight
         self.max_weight = max_weight
         self.is_open_door = is_open_door
+
+    @classmethod
+    def __len__(cls):
+        total = Environment.LEVELS + 4
+        return total
 
     def __eq__(self, other):
         if not isinstance(other, StateElevator):

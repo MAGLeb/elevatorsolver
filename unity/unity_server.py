@@ -3,7 +3,6 @@ import os
 from core.agent.utils import initialize_agent
 from core.manager import Manager
 from core.passenger import Passenger
-from core.types.time_wait_type import TimeWaitType
 from core.types.action_type import ActionType
 from core.utils.environment import Environment
 from core.utils.utils import read_commands_from_file
