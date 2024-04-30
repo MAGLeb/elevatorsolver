@@ -30,7 +30,7 @@ class LearningAgentBase(Agent):
 
         self.prev_actions = [QueuePastActions() for _ in range(Environment.ELEVATORS)]
 
-    def choose_action(self, state: ManagerState) -> List[ActionType]:
+    def choose_action(self, state: List[float]) -> List[ActionType]:
         outside_calls, elevators_state = parse_state(state)
         actions = []
         for i, elevator_state in enumerate(elevators_state):
@@ -54,7 +54,7 @@ class LearningAgentBase(Agent):
         pass
 
 
-def parse_state(state: ManagerState) -> (List[int], List[StateElevator]):
+def parse_state(state: List[float]) -> (List[int], List[StateElevator]):
     outside_calls = state[:Environment.LEVELS]
     elevators_state = []
 
@@ -74,10 +74,10 @@ def go_down_or_up(current_level, level_to_go):
         return ActionType.DOWN
 
 
-def find_level_to_go(going_to: List[int], current_level: int):
+def find_level_to_go(going_to: List[float], current_level: int):
     nearest_level = [float("inf"), None]
     for i, level in enumerate(going_to):
-        if level == 1:
+        if level == float(1):
             diff = abs(current_level - level)
             if diff < nearest_level[0]:
                 nearest_level = [diff, i]
