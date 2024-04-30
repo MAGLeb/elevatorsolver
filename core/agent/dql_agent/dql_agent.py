@@ -29,7 +29,7 @@ class ReplayBuffer:
 
 
 class LearningAgentDQL(nn.Module, Agent):
-    def __init__(self, learning_rate=0.001, exploration_rate=1, buffer_size=4500, batch_size=64):
+    def __init__(self, learning_rate=0.0001, exploration_rate=1, buffer_size=4500, batch_size=64):
         nn.Module.__init__(self)
         Agent.__init__(self)
 
