@@ -1,6 +1,7 @@
 from core.manager import Manager
 from core.passenger import Passenger
 from core.types.action_type import ActionType
+from core.agent.dql_agent.dql_agent import calc_weighted_state
 
 
 def test_manager_in_out_several_passenger():
@@ -8,7 +9,8 @@ def test_manager_in_out_several_passenger():
     elevators_weight = [680, 700]
     manager = Manager(max_levels, elevators_weight)
 
-    state = manager.get_state()
+    state = manager.manager_state()
+    state = calc_weighted_state(state)
     expected_state = [float(0) for _ in range(max_levels)]
     for i in range(len(elevators_weight)):
         elevator_state = [float(0) for _ in range(max_levels)]
@@ -29,13 +31,15 @@ def test_manager_in_out_several_passenger():
     manager.add_passenger_call(passengers[1])
     manager.add_passenger_call(passengers[2])
 
-    state = manager.get_state()
+    state = manager.manager_state()
+    state = calc_weighted_state(state)
     for i in range(3):
         expected_state[i] = float(1)
     assert state == expected_state
 
     manager.step([ActionType.UP, ActionType.OPEN_DOOR])
-    state = manager.get_state()
+    state = manager.manager_state()
+    state = calc_weighted_state(state)
     expected_state[0] = float(0)
     expected_state[20] = float(1 / max_levels)
     expected_state[37] = float(1)
@@ -44,7 +48,8 @@ def test_manager_in_out_several_passenger():
     assert state == expected_state
 
     manager.step([ActionType.OPEN_DOOR, ActionType.CLOSE_DOOR])
-    state = manager.get_state()
+    state = manager.manager_state()
+    state = calc_weighted_state(state)
     expected_state[1] = float(0)
     expected_state[14] = float(1)
     expected_state[21] = float(passenger_weight / elevators_weight[0])
@@ -55,7 +60,8 @@ def test_manager_in_out_several_passenger():
     manager.step([ActionType.CLOSE_DOOR, ActionType.UP])
     manager.step([ActionType.UP, ActionType.UP])
     manager.step([ActionType.OPEN_DOOR, ActionType.OPEN_DOOR])
-    state = manager.get_state()
+    state = manager.manager_state()
+    state = calc_weighted_state(state)
     expected_state[2] = float(0)
     expected_state[15] = float(1)
     expected_state[20] = float(2 / max_levels)
@@ -73,7 +79,8 @@ def test_manager_in_out_several_passenger():
     manager.step([ActionType.UP, ActionType.WAIT])
     manager.step([ActionType.OPEN_DOOR, ActionType.WAIT])
     manager.step([ActionType.CLOSE_DOOR, ActionType.WAIT])
-    state = manager.get_state()
+    state = manager.manager_state()
+    state = calc_weighted_state(state)
     for i in range(10, 20):
         expected_state[i] = float(0)
     expected_state[20] = float(5 / max_levels)

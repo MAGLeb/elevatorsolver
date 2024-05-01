@@ -40,17 +40,16 @@ def initialize_agent(agent_type: AgentType, model_path: str = None):
 
 def run_episode(commands, agent, levels, elevators_weight, case_info: CaseInformation):
     manager = Manager(levels, elevators_weight)
-    state = manager.get_state()
+    state = manager.manager_state()
     total_reward = 0
     j = 0
     reward = [0 for _ in range(Environment.ELEVATORS)]
 
     for step in range(Environment.STEPS):
         case_info.step = step * case_info.episode
-        manager_state = manager.manager_state
-        number_passengers_wait_outside = sum(manager_state.outside_calls)
+        number_passengers_wait_outside = sum(state.outside_calls)
         for i in range(Environment.ELEVATORS):
-            elevator_state = manager_state.elevator_states[i]
+            elevator_state = state.elevator_states[i]
             number_passengers_wait_inside = sum(elevator_state.going_to_level)
             reward[i] += ((number_passengers_wait_outside + number_passengers_wait_inside)
                           * RewardType.PASSENGER_WAIT.value)
@@ -60,6 +59,8 @@ def run_episode(commands, agent, levels, elevators_weight, case_info: CaseInform
         reward = [sum(x) for x in zip(step_reward, reward)]
         if case_info.stage == StageType.TRAIN:
             agent.learn(state, reward, action, next_state, case_info)
+        if case_info.stage == StageType.VALIDATE:
+            print(f"reward: {reward}, action: {action}, manager state: {state}")
         state = next_state
         total_reward += sum(reward)
         reward = [0 for _ in range(Environment.ELEVATORS)]
@@ -70,7 +71,7 @@ def run_episode(commands, agent, levels, elevators_weight, case_info: CaseInform
                 break
             passenger = Passenger(from_level, to_level, weight_passenger)
             manager.add_passenger_call(passenger)
-            state = manager.get_state()
+            state = manager.manager_state()
             j += 1
 
     return total_reward
@@ -100,6 +101,7 @@ def train_val_agent(commands: List[str], agent: Agent, levels: int, elevators_we
 
         # VALIDATION
         case_info.stage = StageType.VALIDATE
+        agent.refresh_state()
         val_rewards = validate_agent(agent, Environment.LEVELS, Environment.ELEVATORS_WEIGHT, case_info)
         val_average_reward = sum(val_rewards) / len(val_rewards)
         total_val_rewards.append(val_average_reward)

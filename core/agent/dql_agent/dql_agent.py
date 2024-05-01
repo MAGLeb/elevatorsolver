@@ -1,6 +1,7 @@
 import random
 from collections import namedtuple, deque
 from typing import List
+from copy import deepcopy
 
 import wandb
 import torch
@@ -10,6 +11,8 @@ import torch.optim as optim
 from core.agent.agent import Agent
 from core.types.action_type import ActionType
 from core.utils.environment import Environment
+from core.manager import ManagerState
+from core.elevator import StateElevator
 
 Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 
@@ -95,7 +98,7 @@ class LearningAgentDQL(nn.Module, Agent):
             'optimizer_state_dict': self.optimizer.state_dict(),
         }, filepath)
 
-    def choose_action(self, state) -> List[ActionType]:
+    def choose_action(self, manager_state: ManagerState) -> List[ActionType]:
         actions = []
 
         self.exploration_rate *= self.exploration_fall
@@ -105,8 +108,9 @@ class LearningAgentDQL(nn.Module, Agent):
                 actions.append(random.choice(list(ActionType)))
             return actions
 
-        state = self._convert_elevator_state_to_tensor(state)
-        output = self.forward(state)
+        weighted_state = calc_weighted_state(deepcopy(manager_state))
+        weighted_state = self._convert_elevator_state_to_tensor(weighted_state)
+        output = self.forward(weighted_state)
         for i in range(self.elevators):
             start = i * len(ActionType)
             end = (i + 1) * len(ActionType)
@@ -117,8 +121,10 @@ class LearningAgentDQL(nn.Module, Agent):
 
         return actions
 
-    def learn(self, state, reward, action, next_state, case_info):
-        self.buffer.push(state, action, next_state, reward)
+    def learn(self, manager_state: ManagerState, reward, action, next_state, case_info):
+        weighted_state = calc_weighted_state(deepcopy(manager_state))
+        next_weighted_state = calc_weighted_state(deepcopy(next_state))
+        self.buffer.push(weighted_state, action, next_weighted_state, reward)
 
         if len(self.buffer) < self.batch_size:
             return
@@ -181,3 +187,26 @@ class LearningAgentDQL(nn.Module, Agent):
         state = torch.tensor(state, dtype=torch.float32).to(self.device)
         state = state.unsqueeze(0)
         return state
+
+    def refresh_state(self):
+        pass
+
+
+def calc_weighted_state(manager_state: ManagerState) -> List[float]:
+    def convert_state_elevator_into_list(elevator_state: StateElevator) -> List[float]:
+        # Map from wide space to [0, 1] range output. It is help NN learn better.
+        scaled_state = []
+        scaled_state += list(map(float, elevator_state.going_to_level))
+        scaled_state.append(elevator_state.current_level / manager_state.max_level)
+        scaled_state.append(elevator_state.current_weight / elevator_state.max_weight)
+        scaled_state.append(elevator_state.max_weight / manager_state.max_elevators_weight)
+        scaled_state.append(float(elevator_state.is_open_door))
+
+        return scaled_state
+
+    state = manager_state.outside_calls
+
+    for elevator_state in manager_state.elevator_states:
+        state += convert_state_elevator_into_list(elevator_state)
+
+    return state

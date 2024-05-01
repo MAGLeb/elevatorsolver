@@ -1,10 +1,15 @@
 from typing import List
+from enum import Enum
 
 from core.agent.agent import Agent
 from core.types.action_type import ActionType
 from core.utils.environment import Environment
-from core.elevator import StateElevator
 from core.manager import ManagerState
+
+
+class Direction(Enum):
+    UP = "UP"
+    DOWN = "DOWN"
 
 
 class QueuePastActions:
@@ -15,9 +20,9 @@ class QueuePastActions:
     def add(self, action: ActionType):
         self.actions.append(action)
         if len(self.actions) > self.size:
-            self.actions = self.actions[:-self.size]
+            self.actions = self.actions[-self.size:]
 
-    def get(self, prev_action_order):
+    def get(self, prev_action_order: int = 1):
         if prev_action_order >= self.size:
             raise ValueError(f"Queue store only {self.size} past actions.")
         action_order = self.size - prev_action_order
@@ -29,56 +34,39 @@ class LearningAgentBase(Agent):
         Agent.__init__(self)
 
         self.prev_actions = [QueuePastActions() for _ in range(Environment.ELEVATORS)]
+        self.direction = Direction.UP
 
-    def choose_action(self, state: List[float]) -> List[ActionType]:
-        outside_calls, elevators_state = parse_state(state)
+    def choose_action(self, manager_state: ManagerState) -> List[ActionType]:
         actions = []
-        for i, elevator_state in enumerate(elevators_state):
+        for i, elevator_state in enumerate(manager_state.elevator_states):
             if elevator_state.is_open_door:
-                actions.append(ActionType.CLOSE_DOOR)
-            elif outside_calls[elevator_state.current_level] == float(1) and self.prev_actions[
-                i] != ActionType.CLOSE_DOOR:
-                actions.append(ActionType.OPEN_DOOR)
-            elif any(elevator_state.going_to_level) == float(1):
-                level_to_go = find_level_to_go(elevator_state.going_to_level, elevator_state.current_level)
-                action = go_down_or_up(elevator_state.current_level, level_to_go)
-                actions.append(action)
+                action = ActionType.CLOSE_DOOR
+            elif (((manager_state.outside_calls[elevator_state.current_level] == 1 and
+                  self.prev_actions[i].get() != ActionType.CLOSE_DOOR) and
+                  elevator_state.current_weight / elevator_state.max_weight < 0.7) or
+                  (elevator_state.going_to_level[elevator_state.current_level] == 1)):
+                action = ActionType.OPEN_DOOR
+            elif self.direction == Direction.UP:
+                action = ActionType.UP
+                if elevator_state.current_level + 2 == manager_state.max_level:
+                    self.direction = Direction.DOWN
+            elif self.direction == Direction.DOWN:
+                action = ActionType.DOWN
+                if elevator_state.current_level - 1 == 0:
+                    self.direction = Direction.UP
             else:
-                actions.append(ActionType.WAIT)
+                action = ActionType.WAIT
+
+            self.prev_actions[i].add(action)
+            actions.append(action)
         return actions
+
+    def refresh_state(self):
+        self.prev_actions = [QueuePastActions() for _ in range(Environment.ELEVATORS)]
+        self.direction = Direction.UP
 
     def save(self, filepath):
         pass
 
-    def learn(self, state, reward, action, next_state):
+    def learn(self, state, reward, action, next_state, case_info):
         pass
-
-
-def parse_state(state: List[float]) -> (List[int], List[StateElevator]):
-    outside_calls = state[:Environment.LEVELS]
-    elevators_state = []
-
-    for i in range(Environment.ELEVATORS):
-        going_to, current_level, current_weight, max_weight, is_open_door = state[
-                                                                            StateElevator.__len__() * (i + 1):]
-        elevator_state = StateElevator(going_to, current_level, current_weight, max_weight, is_open_door)
-        elevators_state.append(elevator_state)
-
-    return outside_calls, elevators_state
-
-
-def go_down_or_up(current_level, level_to_go):
-    if current_level < level_to_go:
-        return ActionType.UP
-    else:
-        return ActionType.DOWN
-
-
-def find_level_to_go(going_to: List[float], current_level: int):
-    nearest_level = [float("inf"), None]
-    for i, level in enumerate(going_to):
-        if level == float(1):
-            diff = abs(current_level - level)
-            if diff < nearest_level[0]:
-                nearest_level = [diff, i]
-    return nearest_level[1]

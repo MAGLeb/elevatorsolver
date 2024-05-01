@@ -24,6 +24,10 @@ class Agent(ABC):
     def learn(self, *args, **params):
         pass
 
+    @abstractmethod
+    def refresh_state(self):
+        pass
+
     @staticmethod
     def calculate_exploration_fall():
         """

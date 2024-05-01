@@ -8,9 +8,21 @@ from core.passenger import Passenger
 
 
 class ManagerState:
-    def __init__(self, outside_calls: List[float], elevator_states: List[StateElevator]):
+    def __init__(self, outside_calls: List[int], elevator_states: List[StateElevator], max_level: int, max_elevators_weight: int):
         self.outside_calls = outside_calls
         self.elevator_states = elevator_states
+        self.max_level = max_level
+        self.max_elevators_weight = max_elevators_weight
+
+    def __str__(self):
+        outside_calls_str = f"  Outside calls: {self.outside_calls}\n"
+
+        elevator_states_str = ""
+        for elevator_state in self.elevator_states:
+            elevator_states_str += f"    Elevator: {elevator_state}\n"
+
+        # Combine the formatted strings into a single representation
+        return f"Manager State:\n{outside_calls_str}{elevator_states_str}"
 
 
 class Manager:
@@ -30,35 +42,14 @@ class Manager:
             action = actions[i]
             reward.append(elevator.step(action, self.levels))
 
-        return self.get_state(), reward
+        return self.manager_state(), reward
 
-    @property
     def manager_state(self) -> ManagerState:
-        outside_calls = [float(level.outside_call) for level in self.levels]
+        outside_calls = [level.outside_call for level in self.levels]
         elevator_states = []
         for i, elevator in enumerate(self.elevators):
             state_elevator = elevator.get_state()
             elevator_states.append(state_elevator)
 
-        manager_state = ManagerState(outside_calls, elevator_states)
+        manager_state = ManagerState(outside_calls, elevator_states, self.max_level, self.max_elevators_weight)
         return manager_state
-
-    def get_state(self) -> List[float]:
-        manager_state = self.manager_state
-        state = manager_state.outside_calls
-
-        for elevator_state in manager_state.elevator_states:
-            state += self._convert_state_elevator_into_list(elevator_state)
-
-        return state
-
-    def _convert_state_elevator_into_list(self, state: StateElevator) -> List[float]:
-        # Map from wide space to [0, 1] range output. It is help NN learn better.
-        scaled_state = []
-        scaled_state += list(map(float, state.going_to_level))
-        scaled_state.append(state.current_level / self.max_level)
-        scaled_state.append(state.current_weight / state.max_weight)
-        scaled_state.append(state.max_weight / self.max_elevators_weight)
-        scaled_state.append(float(state.is_open_door))
-
-        return scaled_state
