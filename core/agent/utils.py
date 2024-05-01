@@ -59,8 +59,6 @@ def run_episode(commands, agent, levels, elevators_weight, case_info: CaseInform
         reward = [sum(x) for x in zip(step_reward, reward)]
         if case_info.stage == StageType.TRAIN:
             agent.learn(state, reward, action, next_state, case_info)
-        if case_info.stage == StageType.VALIDATE:
-            print(f"reward: {reward}, action: {action}, manager state: {state}")
         state = next_state
         total_reward += sum(reward)
         reward = [0 for _ in range(Environment.ELEVATORS)]
