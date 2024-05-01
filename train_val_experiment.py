@@ -23,11 +23,12 @@ with GlobalLogger() as logger:
         # TRAIN & VALIDATE & SAVE
         max_val_reward = -float('inf')
         for i in range(Environment.NUMBER_TRAIN_PER_CASE):
-            case_info = CaseInformation(i)
-            print(f"\nProcessing test {i + 1} out of {Environment.NUMBER_TRAIN_PER_CASE}...")
+            case_number = i + 1
+            case_info = CaseInformation(case_number)
+            print(f"\nProcessing test {case_number} out of {Environment.NUMBER_TRAIN_PER_CASE}...")
 
             # READ TEST
-            filename = f"{Environment.TRAIN_TESTS_PATH}/train_{i + 1}.txt"
+            filename = f"{Environment.TRAIN_TESTS_PATH}/train_{case_number}.txt"
             commands = read_commands_from_file(filename)
 
             # LEARN & VALIDATION
@@ -52,12 +53,12 @@ with GlobalLogger() as logger:
                 agent.save(Environment.MODEL_FILE_PATH)
 
             wandb.log({
-                "case_test_number": i,
+                "case_test_number": case_number,
                 "train_average_reward": train_average_reward,
                 "val_average_reward": valid_average_reward
             })
 
-            print(f"Test {i + 1} processing completed!")
+            print(f"Test {case_number} processing completed!")
 
         print("\nAll tests processed successfully!")
 

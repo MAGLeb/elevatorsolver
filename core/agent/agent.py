@@ -34,5 +34,5 @@ class Agent(ABC):
         First fifth part of all commands, we do exploration then move to take best action from table.
         """
         t = math.log10(0.5)
-        y = int(Environment.STEPS * Environment.NUM_EPISODES / 5)
+        y = int(Environment.STEPS / 5)
         return 10 ** (t / y)

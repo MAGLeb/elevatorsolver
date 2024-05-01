@@ -91,7 +91,7 @@ def train_val_agent(commands: List[str], agent: Agent, levels: int, elevators_we
     total_val_rewards = []
 
     for episode in range(Environment.NUM_EPISODES):
-        case_info.episode = episode * case_info.case
+        case_info.episode = (episode + 1) * case_info.case
         case_info.stage = StageType.TRAIN
         learning_reward = run_episode(commands, agent, levels, elevators_weight, case_info)
         total_rewards.append(learning_reward)

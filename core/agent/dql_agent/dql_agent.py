@@ -32,7 +32,7 @@ class ReplayBuffer:
 
 
 class LearningAgentDQL(nn.Module, Agent):
-    def __init__(self, learning_rate=0.0001, exploration_rate=1, buffer_size=45000, batch_size=64):
+    def __init__(self, learning_rate=0.0001, exploration_rate=1, buffer_size=4500, batch_size=64):
         nn.Module.__init__(self)
         Agent.__init__(self)
 
@@ -46,9 +46,11 @@ class LearningAgentDQL(nn.Module, Agent):
         # outside_levels, inside_levels for each elevator
         # current_level, current_weight, door_state, max_weight for each elevator
         self.fc1 = nn.Linear(self.levels + self.levels * self.elevators + 4 * self.elevators, 1024)
-        self.fc2 = nn.Linear(1024, 256)
+        self.fc2 = nn.Linear(1024, 512)
+        self.rnn = nn.LSTM(512, 256, num_layers=2, batch_first=True)
         self.fc3 = nn.Linear(256, len(ActionType) * self.elevators)
 
+        self.dropout = nn.Dropout(p=0.5)
         self.relu = nn.LeakyReLU()
         self.loss_function = nn.MSELoss()
         self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
@@ -126,7 +128,7 @@ class LearningAgentDQL(nn.Module, Agent):
         next_weighted_state = calc_weighted_state(deepcopy(next_state))
         self.buffer.push(weighted_state, action, next_weighted_state, reward)
 
-        if len(self.buffer) < self.batch_size:
+        if len(self.buffer) < self.buffer_size:
             return
 
         transitions = self.buffer.sample(self.batch_size)
@@ -163,7 +165,12 @@ class LearningAgentDQL(nn.Module, Agent):
     def forward(self, x):
         x = self.relu(self.fc1(x))
         x = self.relu(self.fc2(x))
-        return self.fc3(x)
+        x = x.unsqueeze(1)
+        x, _ = self.rnn(x)
+        x = x[:, -1, :]
+        x = self.dropout(x)
+        x = self.fc3(x)
+        return x
 
     @staticmethod
     def _process_q_values(q_next):
