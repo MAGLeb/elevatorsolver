@@ -2,10 +2,7 @@ from flask import Flask, jsonify
 
 from unity.unity_server import UnityServer
 from core.utils.environment import Environment
-from utils.utils import initialise_settings_wandb
 
-# SETTINGS WANDB
-initialise_settings_wandb(["prediction"])
 
 app = Flask(__name__)
 unity_server = UnityServer()
@@ -15,7 +12,7 @@ unity_server = UnityServer()
 def get_action():
     action, manager_state = unity_server.get_next_action()
     action = list(map(lambda x: x.value, action))
-    outside_calls = list(map(lambda x: int(x.value), manager_state.outside_calls))
+    outside_calls = list(map(lambda x: int(x), manager_state.outside_calls))
     elevators_state = list(map(lambda x: x.going_to_level, manager_state.elevators_state))
     return jsonify({"action": action, "outside_calls": outside_calls, "elevators_state": elevators_state})
 

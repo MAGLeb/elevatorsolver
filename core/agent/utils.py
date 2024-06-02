@@ -23,7 +23,6 @@ def initialize_agent(agent_type: AgentType, model_path: str = None):
         agent = LearningAgentBase()
     elif agent_type == AgentType.DQL:
         agent = LearningAgentDQL()
-        wandb.watch(agent, log_freq=100)
     else:
         raise ValueError(f"Type of agent: {agent_type.value} is not implemented yet.")
 

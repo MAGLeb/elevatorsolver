@@ -12,11 +12,12 @@ public class ElevatorController : MonoBehaviour
 
     public float speed = 5.0f; // скорость лифта
     public float doorSpeed = 5.0f; // Скорость движения дверей
-    public float doorWidth = 0.3f; // Расстояние, на которое двери должны двигаться
+    public float doorWidth = 0.35f; // Расстояние, на которое двери должны двигаться
 
     private Vector3 targetPosition;
  
-    public Floor[] Floors { get; set; }
+    public Floor[] floors;
+
     void Start()
 	{
 		leftDoorClosedPosition = leftDoor.position;
@@ -47,16 +48,16 @@ public class ElevatorController : MonoBehaviour
 
     public void CallElevator(int floorNumber)
     {
-        if (floorNumber >= 0 && floorNumber < Floors.Length)
+        if (floorNumber >= 0 && floorNumber < floors.Length)
         {
-            targetPosition = new Vector3(transform.position.x, Floors[floorNumber].transform.position.y - 0.5f, transform.position.z);
+            targetPosition = new Vector3(transform.position.x, floors[floorNumber].transform.position.y, transform.position.z);
             StartCoroutine(MoveToTargetFloor());
         }
     }
 
     public void MoveUp()
     {
-        if (transform.position.y < Floors[Floors.Length - 1].transform.position.y)
+        if (transform.position.y < floors[floors.Length - 1].transform.position.y)
         {
             CallElevator(GetCurrentFloorNumber() + 1);
         }
@@ -64,7 +65,7 @@ public class ElevatorController : MonoBehaviour
 
     public void MoveDown()
     {
-        if (transform.position.y > Floors[0].transform.position.y)
+        if (transform.position.y > floors[0].transform.position.y)
         {
             CallElevator(GetCurrentFloorNumber() - 1);
         }
@@ -87,9 +88,9 @@ public class ElevatorController : MonoBehaviour
         float closestDistance = float.MaxValue;
         int closestFloorNumber = 0;
 
-        for (int i = 0; i < Floors.Length; i++)
+        for (int i = 0; i < floors.Length; i++)
         {
-            float distance = Mathf.Abs(transform.position.y - Floors[i].transform.position.y);
+            float distance = Mathf.Abs(transform.position.y - floors[i].transform.position.y);
             if (distance < closestDistance)
             {
                 closestDistance = distance;
@@ -110,8 +111,8 @@ public class ElevatorController : MonoBehaviour
 
         if (isDoorOpen)
         {
-            leftDoorClosedPosition = leftDoor.position + new Vector3(0, 0, doorWidth);
-            rightDoorClosedPosition = rightDoor.position + new Vector3(0, 0, -doorWidth);
+            leftDoorClosedPosition = leftDoor.position + new Vector3(0, 0, -doorWidth);
+            rightDoorClosedPosition = rightDoor.position + new Vector3(0, 0, doorWidth);
         }
         else
         {
@@ -122,8 +123,8 @@ public class ElevatorController : MonoBehaviour
 
 	private IEnumerator OpenDoors()
 	{
-		Vector3 leftDoorOpenPosition = leftDoorClosedPosition + new Vector3(0, 0, -doorWidth);
-		Vector3 rightDoorOpenPosition = rightDoorClosedPosition + new Vector3(0, 0, doorWidth);
+		Vector3 leftDoorOpenPosition = leftDoorClosedPosition + new Vector3(0, 0, doorWidth);
+		Vector3 rightDoorOpenPosition = rightDoorClosedPosition + new Vector3(0, 0, -doorWidth);
 
 		while (Vector3.Distance(leftDoor.position, leftDoorOpenPosition) > 0.0005f)
 		{
