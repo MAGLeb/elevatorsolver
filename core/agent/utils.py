@@ -50,7 +50,7 @@ def run_episode(commands, agent, levels, elevators_weight, case_info: CaseInform
         manager_state = manager.manager_state
         number_passengers_wait_outside = sum(manager_state.outside_calls)
         for i in range(Environment.ELEVATORS):
-            elevator_state = manager_state.elevator_states[i]
+            elevator_state = manager_state.elevators_state[i]
             number_passengers_wait_inside = sum(elevator_state.going_to_level)
             reward[i] += ((number_passengers_wait_outside + number_passengers_wait_inside)
                           * RewardType.PASSENGER_WAIT.value)

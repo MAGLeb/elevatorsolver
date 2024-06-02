@@ -8,9 +8,9 @@ from core.passenger import Passenger
 
 
 class ManagerState:
-    def __init__(self, outside_calls: List[float], elevator_states: List[StateElevator]):
+    def __init__(self, outside_calls: List[float], elevators_state: List[StateElevator]):
         self.outside_calls = outside_calls
-        self.elevator_states = elevator_states
+        self.elevators_state = elevators_state
 
 
 class Manager:
@@ -35,19 +35,19 @@ class Manager:
     @property
     def manager_state(self) -> ManagerState:
         outside_calls = [float(level.outside_call) for level in self.levels]
-        elevator_states = []
+        elevators_state = []
         for i, elevator in enumerate(self.elevators):
             state_elevator = elevator.get_state()
-            elevator_states.append(state_elevator)
+            elevators_state.append(state_elevator)
 
-        manager_state = ManagerState(outside_calls, elevator_states)
+        manager_state = ManagerState(outside_calls, elevators_state)
         return manager_state
 
     def get_state(self) -> List[float]:
         manager_state = self.manager_state
         state = manager_state.outside_calls
 
-        for elevator_state in manager_state.elevator_states:
+        for elevator_state in manager_state.elevators_state:
             state += self._convert_state_elevator_into_list(elevator_state)
 
         return state
