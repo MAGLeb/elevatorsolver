@@ -1,10 +1,11 @@
 import wandb
+from typing import List
 
 from core.utils.environment import Environment
 from core.types.reward_type import RewardType
 
 
-def initialise_settings_wandb():
+def initialise_settings_wandb(tags: List):
     if Environment.WANDB_KEY is not None and wandb.login(key=Environment.WANDB_KEY):
         Environment.WANDB_LOGIN = True
         print(f"Training settings:"
@@ -14,7 +15,6 @@ def initialise_settings_wandb():
               f" CASE NAME = {Environment.CASE_NAME},"
               f" AGENT TYPE = {Environment.AGENT_TYPE.value}.")
 
-        tags = []
         if not Environment.IS_PRODUCTION:
             tags += ['local']
         else:

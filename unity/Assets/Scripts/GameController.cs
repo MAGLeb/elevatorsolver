@@ -81,7 +81,7 @@ public class GameController : MonoBehaviour
     {
         ServerResponse response = JsonUtility.FromJson<ServerResponse>(jsonResponse);
 
-        for (int j = 0; i < response.action.Length; i++)
+        for (int j = 0; j < response.action.Length; j++)
         {
             for (int i = 0; i < response.outside_calls.Length; i++)
             {
@@ -102,16 +102,15 @@ public class GameController : MonoBehaviour
                     elevatorsController[j].floors[i].State = FloorState.None;
                 }
             }
-
             elevatorsController[j].PerformAction(response.action[j]);
         }
     }
 
- 	void CreateElevators(int numberOfElevators, int numberOfFloors)
+    void CreateElevators(int numberOfElevators, int numberOfFloors)
     {
         elevatorsController = new ElevatorController[numberOfElevators];
 
-        for (int j = 0; i < numberOfElevators; i++)
+        for (int j = 0; j < numberOfElevators; j++)
         {
             Floor[] floors = new Floor[numberOfFloors + 1];
             Vector3 startingPosition = this.transform.position;
@@ -128,7 +127,7 @@ public class GameController : MonoBehaviour
 
                 floors[i] = floor;
 
-                // Создаем 3D текст и присваиваем его этажу
+                // Creating 3D text and assigning it to the floor
                 GameObject textObj = new GameObject("FloorNumberText");
                 textObj.transform.parent = newFloorObject.transform;
                 float zShift = i >= 10 ? 0.3f : 0.15f;
@@ -137,13 +136,13 @@ public class GameController : MonoBehaviour
                 textObj.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
                 TextMesh textMesh = textObj.AddComponent<TextMesh>();
-                textMesh.text = (i).ToString();
+                textMesh.text = i.ToString();
                 textMesh.fontSize = 12;
                 textMesh.color = Color.black;
 
                 floor.textMesh = textMesh;
             }
-            elevatorsController[j].Floors = floors;
+            elevatorsController[j].floors = floors; // Ensure that ElevatorController has a public 'floors' field
         }
     }
 }

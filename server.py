@@ -2,6 +2,10 @@ from flask import Flask, jsonify
 
 from unity.unity_server import UnityServer
 from core.utils.environment import Environment
+from utils.utils import initialise_settings_wandb
+
+# SETTINGS WANDB
+initialise_settings_wandb(["prediction"])
 
 app = Flask(__name__)
 unity_server = UnityServer()

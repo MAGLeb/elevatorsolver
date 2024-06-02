@@ -11,7 +11,7 @@ from core.types.case_information import CaseInformation
 from utils.utils import initialise_settings_wandb
 
 # SETTINGS WANDB
-initialise_settings_wandb()
+initialise_settings_wandb([])
 
 with GlobalLogger() as logger:
     try:
