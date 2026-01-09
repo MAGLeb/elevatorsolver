@@ -15,6 +15,7 @@ def read_commands_from_file(filename):
         while n != 0:
             line = f.readline().strip().split()
             time, from_level, to_level, weight = line
+            time = int(time)
             from_level = int(from_level)
             to_level = int(to_level)
             weight = int(weight)

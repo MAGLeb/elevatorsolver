@@ -24,11 +24,11 @@ class Manager:
         passenger_level = passenger.from_level
         self.levels[passenger_level].set_outside_elevator_call(passenger)
 
-    def step(self, actions: List[ActionType]) -> [List[float], int]:
+    def step(self, actions: List[ActionType], current_step: int = 0) -> [List[float], int]:
         reward = []
         for i, elevator in enumerate(self.elevators):
             action = actions[i]
-            reward.append(elevator.step(action, self.levels))
+            reward.append(elevator.step(action, self.levels, current_step))
 
         return self.get_state(), reward
 

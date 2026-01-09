@@ -10,6 +10,8 @@ public class ServerResponse
     public int[] action;
     public int[] outside_calls;
     public int[][] elevators_state;
+    public int[] passengers_weight;
+    public int[] max_weight;
 }
 
 [System.Serializable]
@@ -105,6 +107,7 @@ public class GameController : MonoBehaviour
                 }
             }
             elevatorsController[j].PerformAction(response.action[j]);
+            elevatorsController[j].UpdatePassengersWeight(response.passengers_weight[j], response.max_weight[j]);
         }
     }
 
@@ -128,6 +131,7 @@ public class GameController : MonoBehaviour
             ElevatorController elevator = elevatorCabin.AddComponent<ElevatorController>();
 
             SetupDoors(elevator);
+            SetupWeightDisplay(elevator);
 
             elevator.floors = CreateFloors(numberOfFloors);
             for (int i = 0; i < elevator.floors.Length; i++)
@@ -165,6 +169,25 @@ public class GameController : MonoBehaviour
         elevator.rightDoor = rightDoor.transform;
     }
 
+    void SetupWeightDisplay(ElevatorController elevator)
+    {
+        GameObject weightTextObj = new GameObject("WeightDisplay");
+        weightTextObj.transform.parent = elevator.transform;
+        weightTextObj.transform.localPosition = new Vector3(1.5f, 0.5f, 0);
+        weightTextObj.transform.localEulerAngles = new Vector3(0, 90, 0);
+        weightTextObj.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
+
+        TextMesh textMesh = weightTextObj.AddComponent<TextMesh>();
+        textMesh.text = "0/0";
+        textMesh.fontSize = 60;
+        textMesh.color = Color.white;
+        textMesh.anchor = TextAnchor.MiddleCenter;
+        textMesh.alignment = TextAlignment.Center;
+        textMesh.characterSize = 1f;
+        textMesh.fontStyle = FontStyle.Bold;
+
+        elevator.weightDisplay = textMesh;
+    }
 
     private Floor[] CreateFloors(int numberOfFloors)
     {
@@ -186,15 +209,18 @@ public class GameController : MonoBehaviour
             // Creating 3D text and assigning it to the floor
             GameObject textObj = new GameObject("FloorNumberText");
             textObj.transform.parent = newFloorObject.transform;
-            float zShift = i >= 10 ? 0.3f : 0.15f;
-            textObj.transform.localPosition = new Vector3(-0.6f, 0.4f, zShift);
+            textObj.transform.localPosition = new Vector3(-0.55f, 0.0f, 0.0f);
             textObj.transform.localEulerAngles = new Vector3(0, 90, 0);
-            textObj.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            textObj.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
 
             TextMesh textMesh = textObj.AddComponent<TextMesh>();
             textMesh.text = i.ToString();
-            textMesh.fontSize = 12;
+            textMesh.fontSize = 80;
             textMesh.color = Color.black;
+            textMesh.anchor = TextAnchor.MiddleCenter;
+            textMesh.alignment = TextAlignment.Center;
+            textMesh.characterSize = 1f;
+            textMesh.fontStyle = FontStyle.Bold;
 
             floor.textMesh = textMesh;
         }

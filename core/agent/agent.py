@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import math
+from typing import List
 
 from core.types.action_type import ActionType
 from core.utils.environment import Environment
@@ -13,7 +14,7 @@ class Agent(ABC):
         self.exploration_fall = self.calculate_exploration_fall()
 
     @abstractmethod
-    def choose_action(self, state) -> ActionType:
+    def choose_action(self, state, manager_state=None) -> List[ActionType]:
         pass
 
     @abstractmethod

@@ -2,14 +2,30 @@ from enum import Enum
 
 
 class RewardType(Enum):
-    GET_PASSENGER = 0.5
-    DELIVER_PASSENGER = 0.5
+    # Награды за пассажиров (пропорциональны количеству этажей)
+    GET_PASSENGER = 2.0           # взял пассажира
+    DELIVER_PASSENGER = 10.0      # доставил пассажира
+    FAST_DELIVERY_BONUS = 2.0     # бонус за быструю доставку (умножается на коэфф)
 
-    OPEN_CLOSE_DOOR = -0.005
-    UP_DOWN_STEP = -0.015
-    PASSENGER_WAIT = -0.05
-    MOVE_NEXT_TO_EDGE = -1
-    MOVE_WITH_OPEN_DOOR = -1
+    # Энергозатраты
+    ENERGY_MOVE = -0.01           # движение (UP/DOWN)
+    ENERGY_IDLE = 0               # простой
+
+    # Штрафы за плохое поведение
+    MOVE_TO_EDGE = -1.0           # попытка выехать за границу
+    IDLE_WITH_CALLS = -1.0        # WAIT когда есть вызовы
+
+    # Награды для STOP действия
+    SUCCESSFUL_STOP = 0.5         # остановился где есть пассажиры
+    USELESS_STOP = -1.0           # остановился но никого нет
+
+    # Штрафы за неэффективное поведение
+    MOVE_WITHOUT_PURPOSE = -1.0   # движение когда нет вызовов (было -0.3)
+    MISSED_STOP = -1.0            # проехал мимо пассажира (только если не полный!)
+
+    # Накапливающиеся штрафы (за шаг)
+    WAITING_PASSENGER_PENALTY = -0.1   # за каждого ожидающего пассажира
+    PASSENGER_INSIDE_PENALTY = -0.05   # за каждого пассажира внутри лифта
 
     @classmethod
     def to_string(cls):

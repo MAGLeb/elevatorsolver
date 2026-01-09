@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &88492540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -424,7 +424,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &371261283
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1227,7 +1227,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1325853163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1615,8 +1615,8 @@ MonoBehaviour:
   numberOfFloors: 10
   floors: []
   elevatorController: {fileID: 88492540}
-  serverURL: http://localhost:5000/get_action
-  requestInterval: 0.1
+  serverURL: http://localhost:5000
+  requestInterval: 0.5
 --- !u!4 &1377274261
 Transform:
   m_ObjectHideFlags: 0

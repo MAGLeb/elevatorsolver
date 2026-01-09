@@ -39,9 +39,10 @@ with GlobalLogger() as logger:
                                                           Environment.ELEVATORS_WEIGHT,
                                                           case_info)
 
-            train_average_reward = sum(train_reward) / Environment.NUM_EPISODES
+            num_episodes = len(train_reward)  # May be less due to early stopping
+            train_average_reward = sum(train_reward) / num_episodes
             print(f"Training completed with average reward: {train_average_reward}")
-            valid_average_reward = sum(validation_reward) / Environment.NUM_EPISODES
+            valid_average_reward = sum(validation_reward) / num_episodes
             print(f"Validation completed with average reward: {valid_average_reward}")
 
             # SAVE RESULTS
@@ -64,3 +65,6 @@ with GlobalLogger() as logger:
 
     except Exception as e:
         raise e
+    finally:
+        if Environment.WANDB_LOGIN:
+            wandb.finish()

@@ -57,14 +57,22 @@ def generate_levels(n, times, day):
     top_bottom_index = 0
     bottom_top_index = 0
 
+    # Time thresholds relative to day start, scaled for dev/prod mode
+    day_start = Environment.SECONDS_IN_DAY * day
+    seconds_per_hour = Environment.SECONDS_IN_DAY / 24
+    morning_start = day_start + int(5 * seconds_per_hour)    # 5:00
+    morning_end = day_start + int(10 * seconds_per_hour)     # 10:00
+    evening_start = day_start + int(16 * seconds_per_hour)   # 16:00
+
     for i in range(n):
-        if times[i] < 18000 * day:
+        t = times[i]
+        if t < morning_start:           # 0:00-5:00 (night)
             probability = 0.2
-        elif times[i] < 36000 * day:
+        elif t < morning_end:           # 5:00-10:00 (morning rush - UP)
             probability = 0.9
-        elif times[i] < 57600 * day:
+        elif t < evening_start:         # 10:00-16:00 (day/lunch)
             probability = 0.5
-        else:
+        else:                           # 16:00-24:00 (evening rush - DOWN)
             probability = 0.2
         level_pair, top_bottom_index, bottom_top_index = choose_level(tb, bt, probability,
                                                                       top_bottom_index, bottom_top_index)

@@ -1,5 +1,6 @@
 class Passenger:
-    def __init__(self, from_level: int, to_level: int, weight: int):
+    def __init__(self, from_level: int, to_level: int, weight: int, spawn_step: int = 0):
         self.from_level = from_level
         self.to_level = to_level
         self.weight = weight
+        self.spawn_step = spawn_step

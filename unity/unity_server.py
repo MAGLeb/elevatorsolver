@@ -15,15 +15,20 @@ class UnityServer:
         self.agent = initialize_agent(Environment.AGENT_TYPE, Environment.MODEL_FILE_PATH)
         self.agent.exploration_rate = 0
 
-        self.commands = read_commands_from_file(
-            os.path.join(Environment.VALIDATE_TESTS_PATH, 'validation_1.txt'))
+        # Используем validation_unity.txt для более частых пассажиров (для визуализации)
+        unity_test = os.path.join(Environment.VALIDATE_TESTS_PATH, 'validation_unity.txt')
+        if os.path.exists(unity_test):
+            self.commands = read_commands_from_file(unity_test)
+        else:
+            self.commands = read_commands_from_file(
+                os.path.join(Environment.VALIDATE_TESTS_PATH, 'validation_1.txt'))
 
         self.state = self.manager.get_state()
         self.step = 0
         self.current_command_idx = 0
 
     def get_next_action(self) -> (List[float], ManagerState):
-        action = self.agent.choose_action(self.state)
+        action = self.agent.choose_action(self.state, self.manager.manager_state)
         self.state, _ = self.manager.step(action)
 
         while len(self.commands) > self.current_command_idx:

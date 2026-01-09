@@ -32,6 +32,12 @@ class Environment:
     AGENT_TYPE = None
     ELEVATORS_WEIGHT = None
 
+    # Q-Table hyperparameters
+    Q_LEARNING_RATE = 0.1
+    Q_DISCOUNT_RATE = 0.9
+    Q_EXPLORATION_RATE = 1.0
+    Q_EXPLORATION_FALL = None  # None = use calculated default
+
     # PATHS
     VALIDATE_TESTS_PATH = None
     TRAIN_TESTS_PATH = None
@@ -43,7 +49,8 @@ class Environment:
 
     # Each step is a second on the daytime. We set 86400 more than seconds
     # on the day, to give extra time for Elevator to process all the passengers.
-    SECONDS_IN_DAY = 86400 if IS_PRODUCTION else 100
+    # Dev mode: 5000 steps allows realistic simulation of 500 passengers
+    SECONDS_IN_DAY = 86400 if IS_PRODUCTION else 5000
     STEPS = None
 
     def __init__(self):
@@ -74,6 +81,13 @@ class Environment:
         cls.CASE_NAME = case_params.get('case_name')
         if cls.CASE_NAME is None:
             cls.CASE_NAME = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(7))
+
+        # Q-Table hyperparameters
+        q_table_params = params.get('q_table_params', {})
+        cls.Q_LEARNING_RATE = q_table_params.get('learning_rate', 0.1)
+        cls.Q_DISCOUNT_RATE = q_table_params.get('discount_rate', 0.9)
+        cls.Q_EXPLORATION_RATE = q_table_params.get('exploration_rate', 1.0)
+        cls.Q_EXPLORATION_FALL = q_table_params.get('exploration_fall', None)
 
     @classmethod
     def _create_case_config(cls, path):

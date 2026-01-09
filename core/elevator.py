@@ -42,21 +42,25 @@ class Elevator:
         self.current_level = 0
         self.is_door_open = False
 
-    def step(self, action: ActionType, levels: List[Level]) -> int:
-        if action == ActionType.UP:
-            reward = self._up()
-        elif action == ActionType.DOWN:
-            reward = self._down()
-        elif action == ActionType.CLOSE_DOOR:
-            reward = self._close()
-        elif action == ActionType.OPEN_DOOR:
-            reward = self._open(levels)
-        elif action == ActionType.WAIT:
-            reward = 0
-        else:
-            raise ValueError("Only 5 types of action.")
+    def step(self, action: ActionType, levels: List[Level], current_step: int = 0) -> int:
+        # Двери открываются ТОЛЬКО при действии STOP
+        if action == ActionType.STOP:
+            should_open = (
+                self.going_to_level[self.current_level] > 0 or
+                levels[self.current_level].outside_call > 0
+            )
+            if should_open:
+                return self._handle_door(levels, current_step)
+            # STOP но некого обслуживать - просто стоим
+            return RewardType.ENERGY_IDLE.value
 
-        return reward
+        # UP/DOWN/WAIT - НЕ открывают двери
+        if action == ActionType.UP:
+            return self._up()
+        elif action == ActionType.DOWN:
+            return self._down()
+        else:  # WAIT
+            return RewardType.ENERGY_IDLE.value
 
     def _get_passengers_into_elevator(self, levels: List[Level]) -> int:
         passengers = 0
@@ -73,13 +77,23 @@ class Elevator:
 
         return passengers * RewardType.GET_PASSENGER.value
 
-    def _get_out_passengers_from_elevator(self) -> int:
+    def _get_out_passengers_from_elevator(self, current_step: int = 0) -> int:
         reward = 0
+        max_fast_steps = self.max_levels  # быстрая доставка = меньше шагов чем этажей
 
         for p in self.passengers:
             if p.to_level == self.current_level:
                 self.current_weight -= p.weight
-                reward += RewardType.DELIVER_PASSENGER.value
+                wait_time = current_step - getattr(p, 'spawn_step', 0)
+                base_reward = RewardType.DELIVER_PASSENGER.value
+
+                # Бонус за быструю доставку (если доставил быстрее чем кол-во этажей)
+                if wait_time <= max_fast_steps:
+                    bonus = RewardType.FAST_DELIVERY_BONUS.value * (1 - wait_time / max_fast_steps)
+                else:
+                    bonus = 0
+
+                reward += base_reward + bonus
         self.passengers = [p for p in self.passengers if p.to_level != self.current_level]
 
         return reward
@@ -90,42 +104,26 @@ class Elevator:
         return state
 
     def _up(self):
-        reward = RewardType.UP_DOWN_STEP.value
-
-        if self.is_door_open:
-            reward += RewardType.MOVE_WITH_OPEN_DOOR.value
-
+        reward = RewardType.ENERGY_MOVE.value
         if self.current_level == self.max_levels - 1:
-            reward += RewardType.MOVE_NEXT_TO_EDGE.value
+            reward += RewardType.MOVE_TO_EDGE.value
         else:
             self.current_level += 1
         return reward
 
     def _down(self):
-        reward = RewardType.UP_DOWN_STEP.value
-
-        if self.is_door_open:
-            reward += RewardType.MOVE_WITH_OPEN_DOOR.value
-
+        reward = RewardType.ENERGY_MOVE.value
         if self.current_level == 0:
-            reward += RewardType.MOVE_NEXT_TO_EDGE.value
+            reward += RewardType.MOVE_TO_EDGE.value
         else:
             self.current_level -= 1
         return reward
 
-    def _close(self):
-        reward = RewardType.OPEN_CLOSE_DOOR.value
-        self.is_door_open = False
-        return reward
-
-    def _open(self, levels: List[Level]):
-        self.going_to_level[self.current_level] = 0
+    def _handle_door(self, levels: List[Level], current_step: int = 0):
         self.is_door_open = True
-
-        reward = RewardType.OPEN_CLOSE_DOOR.value
-        # 1. get out passengers from elevator
-        reward += self._get_out_passengers_from_elevator()
-        # 2. enter passengers to elevator
+        reward = 0
+        reward += self._get_out_passengers_from_elevator(current_step)
+        self.going_to_level[self.current_level] = 0
         reward += self._get_passengers_into_elevator(levels)
-
+        self.is_door_open = False
         return reward

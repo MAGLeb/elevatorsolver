@@ -1,48 +1,86 @@
+from typing import List, Optional
+from enum import Enum
+
 from core.agent.agent import Agent
 from core.types.action_type import ActionType
+from core.utils.environment import Environment
+
+
+class Direction(Enum):
+    UP = "UP"
+    DOWN = "DOWN"
+
+
+class QueuePastActions:
+    def __init__(self, queue_size: int = 5):
+        self.size = queue_size
+        self.actions = [ActionType.WAIT for _ in range(self.size)]
+
+    def add(self, action: ActionType):
+        self.actions.append(action)
+        if len(self.actions) > self.size:
+            self.actions = self.actions[-self.size:]
+
+    def get(self, prev_action_order: int = 1):
+        if prev_action_order >= self.size:
+            raise ValueError(f"Queue store only {self.size} past actions.")
+        action_order = self.size - prev_action_order
+        return self.actions[action_order]
 
 
 class LearningAgentBase(Agent):
     def __init__(self):
-        super().__init__()
+        Agent.__init__(self)
 
-        self.level_to_go = None
+        self.prev_actions = [QueuePastActions() for _ in range(Environment.ELEVATORS)]
+        self.direction = Direction.UP
 
-    @staticmethod
-    def _find_level_to_go(outside_call_levels, inside_call_levels):
-        if len(inside_call_levels) > 0:
-            return min(inside_call_levels)
-        return max(outside_call_levels)
+    def choose_action(self, state: List[float], manager_state=None) -> List[ActionType]:
+        if manager_state is None:
+            return [ActionType.WAIT for _ in range(Environment.ELEVATORS)]
 
-    def _go_down_or_up(self, current_level):
-        if current_level < self.level_to_go:
-            return ActionType.UP
-        else:
-            return ActionType.DOWN
+        actions = []
+        for i, elevator_state in enumerate(manager_state.elevators_state):
+            current_level = elevator_state.current_level
 
-    def choose_action(self, state) -> ActionType:
-        outside_calls, inside_calls, current_level, weight, is_opened = state
+            # Проверяем есть ли вообще вызовы
+            has_outside_calls = sum(manager_state.outside_calls) > 0
+            has_inside_passengers = sum(elevator_state.going_to_level) > 0
+            has_any_calls = has_outside_calls or has_inside_passengers
 
-        if self.level_to_go is not None and current_level < self.level_to_go:
-            return self._go_down_or_up(current_level)
+            # Если нет вызовов - ждём
+            if not has_any_calls:
+                action = ActionType.WAIT
+            else:
+                # Проверяем нужно ли остановиться на текущем этаже
+                should_stop = (
+                    elevator_state.going_to_level[current_level] > 0 or
+                    manager_state.outside_calls[current_level] > 0
+                )
 
-        if is_opened:
-            return ActionType.CLOSE_DOOR
-        is_outside_call = len([i for i in outside_calls if i == 1]) != 0
-        is_inside_call = len([i for i in inside_calls if i == 1]) != 0
-        if not is_outside_call and not is_inside_call:
-            return ActionType.WAIT
-        outside_call_levels = [i for i in range(len(outside_calls)) if outside_calls[i] == 1]
-        inside_call_levels = [i for i in range(len(inside_calls)) if inside_calls[i] == 1]
+                if should_stop:
+                    action = ActionType.STOP
+                elif self.direction == Direction.UP:
+                    action = ActionType.UP
+                    if current_level + 2 >= len(manager_state.outside_calls):
+                        self.direction = Direction.DOWN
+                elif self.direction == Direction.DOWN:
+                    action = ActionType.DOWN
+                    if current_level <= 1:
+                        self.direction = Direction.UP
+                else:
+                    action = ActionType.WAIT
 
-        if (current_level in outside_call_levels and weight < 7) or (current_level in inside_call_levels):
-            return ActionType.OPEN_DOOR
+            self.prev_actions[i].add(action)
+            actions.append(action)
+        return actions
 
-        self.level_to_go = self._find_level_to_go(outside_call_levels, inside_call_levels)
-        return self._go_down_or_up(current_level)
+    def refresh_state(self):
+        self.prev_actions = [QueuePastActions() for _ in range(Environment.ELEVATORS)]
+        self.direction = Direction.UP
 
     def save(self, filepath):
         pass
 
-    def learn(self, state, reward, action, next_state):
+    def learn(self, state, reward, action, next_state, case_info, manager_state=None, next_manager_state=None):
         pass
